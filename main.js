@@ -1,4 +1,143 @@
 // ══════════════════════════════════════
+// YIN-YANG DIAGONAL BACKGROUND
+// ══════════════════════════════════════
+(function () {
+  const cnv = document.getElementById('bgCanvas');
+  if (!cnv) return;
+  const ctx = cnv.getContext('2d');
+
+  let W, H, t = 0;
+
+  function resize() {
+    W = cnv.width  = window.innerWidth;
+    H = cnv.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Color palette for flowing boundary blobs
+  // Matches the site's liquid-gradient palette for harmony
+  const palette = [
+    [212, 255,  98],  // acid lime   ── site accent
+    [  0, 245, 200],  // teal
+    [ 56, 189, 248],  // sky blue
+    [168,  85, 247],  // purple
+    [255, 107, 107],  // coral
+    [255, 217,  61],  // gold
+    [ 34, 211, 238],  // cyan
+    [200, 150, 255],  // lavender
+  ];
+
+  // "/" diagonal from (W,0) → (0,H)
+  // Point at parameter s: (W*(1-s), H*s)
+  // Signed distance of point (px,py) from "/" line:
+  //   d = (H*px + W*py - W*H) / sqrt(H²+W²)
+  //   d < 0  → upper-left (black)  d > 0  → lower-right (dark forest)
+
+  function frame() {
+    t += 0.003;
+    ctx.clearRect(0, 0, W, H);
+
+    // ── 1. Black half (upper-left of "/" diagonal) ──────────────────
+    ctx.fillStyle = '#060806';
+    ctx.fillRect(0, 0, W, H);
+
+    // ── 2. Deep dark forest half (lower-right) ──────────────────────
+    // Path: triangle {(W,0), (W,H), (0,H)}
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(W, 0);
+    ctx.lineTo(W, H);
+    ctx.lineTo(0, H);
+    ctx.closePath();
+
+    // Subtle dark forest gradient — clearly different from black but not bright
+    const forestGrad = ctx.createLinearGradient(W, H, 0, 0);
+    forestGrad.addColorStop(0,   '#010d06');  // darkest forest at corner
+    forestGrad.addColorStop(0.5, '#030f09');  // mid dark emerald
+    forestGrad.addColorStop(1,   '#060807');  // near-black at diagonal edge
+    ctx.fillStyle = forestGrad;
+    ctx.fill();
+    ctx.restore();
+
+    // ── 3. Subtle "yin dot" — a tiny speck of forest on the black side ──
+    // (yin-yang concept: each side holds a seed of the other)
+    const dotPhase = t * 0.2;
+    const dotX = W * 0.28 + Math.sin(dotPhase) * W * 0.06;
+    const dotY = H * 0.28 + Math.cos(dotPhase * 0.8) * H * 0.06;
+    const dotR = Math.min(W, H) * 0.04;
+    const dotG = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, dotR);
+    dotG.addColorStop(0, 'rgba(3,18,10,0.45)');
+    dotG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = dotG;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── 4. Flowing rainbow blobs along the "/" diagonal ─────────────
+    // Blobs travel along the diagonal over time (travelling wave)
+    // Screen blend makes colors add together → natural luminous mix
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    const nBlobs = 9;
+    for (let k = 0; k < nBlobs; k++) {
+      // Each blob travels along the diagonal at different speeds
+      const speed  = 0.018 + k * 0.006;
+      const s      = ((k / nBlobs) + t * speed) % 1; // 0–1 position along diagonal
+
+      // Base position on "/" diagonal
+      const bx0 = W * (1 - s);
+      const by0 = H * s;
+
+      // Perpendicular oscillation (adds organic waving to the boundary)
+      const perpAmp  = 0.04 * Math.min(W, H);
+      const perpPhase = t * (0.4 + k * 0.12) + k * 1.1;
+      // "/" diagonal normal is (H, W)/norm → rotate 90° → (-W, H)/norm
+      const norm = Math.sqrt(W * W + H * H);
+      const nx = -W / norm, ny = H / norm;
+      const perp = Math.sin(perpPhase) * perpAmp;
+
+      const bx = bx0 + nx * perp;
+      const by = by0 + ny * perp;
+
+      // Blob radius breathes gently
+      const bR = Math.min(W, H) * (0.13 + Math.sin(t * 0.5 + k * 0.7) * 0.04);
+
+      // Alpha pulses — stays subtle to be "high-end"
+      const alpha = 0.10 + Math.sin(t * 0.8 + k * 0.5) * 0.03;
+
+      const [pr, pg, pb] = palette[k % palette.length];
+      const g = ctx.createRadialGradient(bx, by, 0, bx, by, bR);
+      g.addColorStop(0,   `rgba(${pr},${pg},${pb},${alpha})`);
+      g.addColorStop(0.5, `rgba(${pr},${pg},${pb},${alpha * 0.35})`);
+      g.addColorStop(1,   'rgba(0,0,0,0)');
+
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // ── 5. Extra wide soft glow centered on the diagonal ────────────
+    // This blends the two halves smoothly right at the edge
+    const glowS = (Math.sin(t * 0.15) * 0.5 + 0.5); // slow drift 0-1
+    const gx = W * (1 - glowS);
+    const gy = H * glowS;
+    const glowR = Math.min(W, H) * 0.28;
+
+    const glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, glowR);
+    glow.addColorStop(0,   'rgba(0, 220, 150, 0.04)');
+    glow.addColorStop(0.4, 'rgba(56, 189, 248, 0.025)');
+    glow.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.restore();
+
+    requestAnimationFrame(frame);
+  }
+
+  frame();
+})();
+
+// ══════════════════════════════════════
 // Custom Cursor — Morphing Gradient Ring
 // ══════════════════════════════════════
 (function () {
