@@ -322,14 +322,19 @@ main { max-width: 1180px; margin: 0 auto; }
   letter-spacing: -.03em;
   max-width: 100%;
   overflow: visible;
+  filter: drop-shadow(0 0 32px rgba(0,245,200,.18));
 }
 
 /* “Josephine” — liquid flowing gradient */
 .hero h1 .name-gradient {
-  display: block;
+  display: inline-block;
   /* Fit to container, never clip */
-  width: fit-content;
   max-width: 100%;
+  /* Extra right padding compensates for:
+     1. letter-spacing -0.03em bleed on last char
+     2. drop-shadow filter visual overflow
+     This extends the background-clip area so the period renders fully */
+  padding-right: 0.12em;
   /* 6-stop multicolor mimicking the 3D blob palette */
   background: linear-gradient(
     -45deg,
@@ -347,8 +352,6 @@ main { max-width: 1180px; margin: 0 auto; }
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: liquid-flow 7s ease-in-out infinite;
-  /* Give the letters a very subtle glow via drop-shadow */
-  filter: drop-shadow(0 0 32px rgba(0,245,200,.18));
 }
 
 @keyframes liquid-flow {
