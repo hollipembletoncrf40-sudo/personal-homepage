@@ -422,35 +422,28 @@ document.addEventListener('keydown', e => {
   const originalPos = new Float32Array(positionAttr.array.length);
   originalPos.set(positionAttr.array);
 
-  // ── Shader Material — Fiber Bundle ──
+  // ── Shader Material — Fiber Bundle (WebGL-safe) ──
   const material = new THREE.ShaderMaterial({
     uniforms: {
-      uTime:       { value: 0 },
-      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      uTime: { value: 0 },
     },
     vertexShader: `
       varying vec3 vNormal;
       varying vec3 vPosition;
-      varying vec3 vWorldPos;
-      varying vec2 vUv;
       uniform float uTime;
 
-      // Multi-octave displacement for organic silhouette
-      float displace(vec3 p, float t) {
-        float n  = sin(p.x * 2.1 + t * 0.55) * cos(p.y * 1.8 - t * 0.38) * sin(p.z * 2.4 + t * 0.47) * 0.26;
-        float n2 = sin(p.x * 4.2 + p.y * 3.1 + t * 0.9)  * 0.10;
-        float n3 = cos(p.y * 5.0 + p.z * 3.8 - t * 0.62) * 0.07;
-        float n4 = sin(p.z * 3.3 - p.x * 2.7 + t * 1.1)  * 0.05;
-        return n + n2 + n3 + n4;
-      }
-
       void main() {
-        vUv      = uv;
-        vNormal  = normalize(normalMatrix * normal);
+        vNormal   = normalize(normalMatrix * normal);
         vPosition = position;
-        vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
 
-        float d = displace(position, uTime);
+        // 4-octave organic displacement
+        float d  = sin(position.x * 2.1 + uTime * 0.55)
+                 * cos(position.y * 1.8 - uTime * 0.38)
+                 * sin(position.z * 2.4 + uTime * 0.47) * 0.26;
+        d += sin(position.x * 4.2 + position.y * 3.1 + uTime * 0.90) * 0.10;
+        d += cos(position.y * 5.0 + position.z * 3.8 - uTime * 0.62) * 0.07;
+        d += sin(position.z * 3.3 - position.x * 2.7 + uTime * 1.10) * 0.05;
+
         vec3 newPos = position + normal * d;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
       }
@@ -458,108 +451,86 @@ document.addEventListener('keydown', e => {
     fragmentShader: `
       varying vec3 vNormal;
       varying vec3 vPosition;
-      varying vec3 vWorldPos;
-      varying vec2 vUv;
       uniform float uTime;
 
-      // ── 8-stop cosine palette (Inigo Quilez style) ──
+      // ── Dual cosine palette (8 perceptual colours) ──
       vec3 pal(float t) {
-        // Palette A: teal → purple → lime
         vec3 a1 = vec3(0.15, 0.40, 0.60);
         vec3 b1 = vec3(0.60, 0.45, 0.40);
         vec3 c1 = vec3(1.00, 0.75, 0.50);
         vec3 d1 = vec3(0.00, 0.20, 0.55);
-        vec3 c = a1 + b1 * cos(6.2832 * (c1 * t + d1));
+        vec3 A = a1 + b1 * cos(6.2832 * (c1 * t + d1));
 
-        // Palette B: coral → gold → cyan
         vec3 a2 = vec3(0.55, 0.30, 0.10);
         vec3 b2 = vec3(0.45, 0.50, 0.55);
         vec3 c2 = vec3(0.70, 0.90, 1.10);
         vec3 d2 = vec3(0.35, 0.05, 0.75);
-        vec3 d = a2 + b2 * cos(6.2832 * (c2 * t + d2));
+        vec3 B = a2 + b2 * cos(6.2832 * (c2 * t + d2));
 
-        // Blend palettes based on time — always shifting
-        return mix(c, d, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.09));
+        return mix(A, B, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.09));
       }
 
-      // ── Fiber strand function ──
-      // Fibers run along the φ (longitude) direction on the sphere surface.
-      // We carve thin bright lines out of the surface using fract + smoothstep.
-      float fiberStrand(vec3 p, float freq, float thickness, float offset) {
-        // Map position to a latitude-like coordinate (fiber axis)
-        float lon = atan(p.z, p.x) / 6.2832 + 0.5; // 0..1 around sphere
-        float lat = asin(clamp(p.y / 1.6, -1.0, 1.0)) / 3.14159 + 0.5;
-
-        // Fibers run in a spiral: longitude + twisted latitude
-        float spiral = lon * freq + lat * (freq * 0.37) + offset;
-        spiral = fract(spiral + uTime * 0.03);
-
-        // Sharp fiber line
-        float line = 1.0 - smoothstep(0.0, thickness, min(spiral, 1.0 - spiral));
-        return line;
+      // ── Fiber strand via dot-product band (WebGL-safe, no atan needed) ──
+      // Projects position onto an axis, creates repeating thin lines with fract
+      float fiber(vec3 p, vec3 axis, float freq, float speed) {
+        float proj = dot(normalize(p), normalize(axis));
+        float band = fract(proj * freq + uTime * speed);
+        return 1.0 - smoothstep(0.0, 0.06, min(band, 1.0 - band));
       }
 
       void main() {
-        vec3 viewDir = normalize(cameraPosition - vWorldPos);
-        float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.8);
+        // Fresnel (view-space normal — safe without cameraPosition varying)
+        float NdotV = max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+        float fresnel = pow(1.0 - NdotV, 3.0);
 
-        // ── Base iridescent colour ──
+        // ── Base colour ──
         float tBase = vPosition.y * 0.22 + vPosition.x * 0.10
-                    + length(vPosition) * 0.15
-                    + uTime * 0.04;
-        vec3 baseCol = pal(tBase);
+                    + vPosition.z * 0.08 + uTime * 0.04;
+        vec3 base = pal(tBase);
 
-        // ── Fiber layers (4 overlapping spiral sets) ──
-        // Different frequencies, thicknesses, rotational offsets, speeds
-        float f1 = fiberStrand(vPosition, 18.0, 0.035, 0.0);
-        float f2 = fiberStrand(vPosition, 12.0, 0.028, 0.33 + uTime * 0.008);
-        float f3 = fiberStrand(vPosition, 28.0, 0.020, 0.67 - uTime * 0.011);
-        // Cross-fibers (rotated frame — swap x/z)
-        vec3 rotP = vec3(vPosition.z, vPosition.y, -vPosition.x);
-        float f4 = fiberStrand(rotP, 14.0, 0.030, 0.5 + uTime * 0.006);
+        // ── 4 fiber layers along different axes ──
+        // Each axis gives a different "winding" around the sphere
+        float f1 = fiber(vPosition, vec3(0.0, 1.0, 0.0), 20.0,  0.04);  // Y-axis winds
+        float f2 = fiber(vPosition, vec3(1.0, 0.0, 0.0), 16.0, -0.03);  // X-axis winds
+        float f3 = fiber(vPosition, vec3(0.7, 0.7, 0.0), 26.0,  0.05);  // diagonal
+        float f4 = fiber(vPosition, vec3(0.0, 0.5, 0.8), 14.0, -0.02);  // oblique
 
-        // Combine fibers — each gets its own palette colour
-        float t1 = tBase + 0.00; vec3 fc1 = pal(t1) * 2.5;
-        float t2 = tBase + 0.25; vec3 fc2 = pal(t2) * 2.2;
-        float t3 = tBase + 0.50; vec3 fc3 = pal(t3) * 3.0;
-        float t4 = tBase + 0.75; vec3 fc4 = pal(t4) * 2.0;
+        // Each fiber gets its own color from the palette
+        vec3 fc1 = pal(tBase + 0.00) * 3.2;
+        vec3 fc2 = pal(tBase + 0.25) * 2.8;
+        vec3 fc3 = pal(tBase + 0.50) * 3.5;
+        vec3 fc4 = pal(tBase + 0.75) * 2.5;
 
-        vec3 fiberGlow = fc1 * f1 + fc2 * f2 + fc3 * f3 + fc4 * f4;
+        vec3 fibers = fc1 * f1 + fc2 * f2 + fc3 * f3 + fc4 * f4;
 
-        // ── Caustic / energy shimmer ──
-        float shimmer = sin(vPosition.x * 8.0 + uTime * 1.2)
-                      * sin(vPosition.y * 6.5 - uTime * 0.9)
-                      * sin(vPosition.z * 7.2 + uTime * 1.5);
-        shimmer = max(0.0, shimmer) * 0.4;
+        // ── Caustic shimmer ──
+        float shimmer = sin(vPosition.x * 9.0 + uTime * 1.3)
+                      * sin(vPosition.y * 7.0 - uTime * 1.0)
+                      * sin(vPosition.z * 8.0 + uTime * 1.6);
+        shimmer = max(0.0, shimmer) * 0.45;
 
-        // ── Colour hot-spots ──
-        vec3 acidGreen  = vec3(0.82, 1.00, 0.28);
-        vec3 hotCoral   = vec3(1.00, 0.35, 0.55);
-        vec3 electricCyan = vec3(0.15, 1.00, 0.88);
-        vec3 deepPurple = vec3(0.55, 0.10, 1.00);
-
-        float gt = 0.5 + 0.5 * sin(uTime * 0.3 + vPosition.y * 2.0);
+        // ── Accent hot-spots ──
+        float gt = 0.5 + 0.5 * sin(uTime * 0.30 + vPosition.y * 2.0);
         float ct = 0.5 + 0.5 * cos(uTime * 0.25 + vPosition.x * 1.5);
+        vec3 hotspot = mix(vec3(1.0, 0.35, 0.55), vec3(0.82, 1.0, 0.28), gt) * 0.30
+                     + mix(vec3(0.15, 1.0, 0.88), vec3(0.55, 0.10, 1.0), ct) * 0.22;
 
-        vec3 hotSpot = mix(hotCoral, acidGreen, gt) * 0.35
-                     + mix(electricCyan, deepPurple, ct) * 0.25;
+        // ── Fresnel rim (cyan→purple) ──
+        vec3 rimCol = mix(vec3(0.15, 1.0, 0.88), vec3(0.55, 0.10, 1.0),
+                          0.5 + 0.5 * sin(uTime * 0.20));
+        vec3 rim = rimCol * fresnel * 2.5;
 
-        // ── Rim glow layers ──
-        vec3 rimCol = mix(electricCyan, deepPurple, 0.5 + 0.5 * sin(uTime * 0.2));
-        vec3 rimGlow = rimCol * fresnel * 2.2;
+        // ── Compose ──
+        vec3 col = base * 0.40
+                 + fibers * 0.72
+                 + shimmer * vec3(0.15, 1.0, 0.88)
+                 + hotspot
+                 + rim;
 
-        // ── Assemble ──
-        vec3 col = baseCol * 0.45              // dim base (fibers sit on top)
-                 + fiberGlow * 0.70            // bright fiber strands
-                 + shimmer * electricCyan      // caustic flicker
-                 + hotSpot                     // colour accents
-                 + rimGlow;                    // electric rim
-
-        // Exposure & tone-map (simple Reinhard on luminance)
+        // Reinhard tone-map
         float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
-        col = col / (1.0 + lum * 0.45);
+        col /= (1.0 + lum * 0.45);
 
-        // Gamma
         col = pow(max(col, vec3(0.0)), vec3(0.85));
 
         gl_FragColor = vec4(col, 1.0);
