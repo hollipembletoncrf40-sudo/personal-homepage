@@ -1713,8 +1713,8 @@ main { max-width: 1180px; margin: 0 auto; }
   .nav a { padding: 0 9px; font-size: 12px; }
   .lang-btn { height: 28px; padding: 0 11px; font-size: 11px; }
 
-  /* Hero */
-  .hero { padding: 88px 0 60px; }
+  /* Hero — more bottom padding so Josephine. descenders don't clip */
+  .hero { padding: 88px 0 140px; }
   .hero-bottom { grid-template-columns: 1fr; gap: 24px; margin-top: 32px; }
   .hero-actions { flex-direction: row; flex-wrap: wrap; }
   .hero-stats { max-width: 100%; gap: 0; }
@@ -1767,8 +1767,10 @@ main { max-width: 1180px; margin: 0 auto; }
   /* Hide some nav items on very small screens, keep key ones */
   .nav a[href="#stack"] { display: none; }
 
-  /* Hero */
-  .hero { padding: 80px 0 48px; }
+  /* Hero — large padding-bottom pushes Josephine. up from viewport edge */
+  .hero { padding: 80px 0 130px; }
+  /* Override desktop inline margin-bottom on h1 — less space needed on mobile */
+  .hero h1 { margin-bottom: 40px !important; }
   .hero-meta { gap: 6px; flex-wrap: wrap; }
   .tag { font-size: 9px; padding: 3px 8px; }
   .hero-hi { font-size: clamp(18px, 5vw, 26px); }
