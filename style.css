@@ -473,10 +473,12 @@ main { max-width: 1180px; margin: 0 auto; }
 }
 
 .hero-copy {
-  max-width: 480px;
-  color: rgba(246,244,232,.65);
-  font-size: clamp(14px, 1.6vw, 17px);
-  line-height: 1.74;
+  max-width: 440px;
+  color: rgba(246,244,232,.50);
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.90;
+  letter-spacing: 0.015em;
+  font-weight: 400;
 }
 
 .hero-actions {
