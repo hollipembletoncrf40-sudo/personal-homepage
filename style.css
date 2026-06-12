@@ -314,8 +314,8 @@ main { max-width: 1180px; margin: 0 auto; }
   flex-direction: column;
   justify-content: flex-end;
   min-height: calc(100svh - 106px);
-  padding: 120px 0 90px;
-  overflow: visible;   /* allow chars to animate without clipping */
+  padding: 120px 0 160px;   /* 160px bottom → Josephine. moves up, J/p descenders show */
+  overflow: visible;
 }
 
 .hero-meta {
