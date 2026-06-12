@@ -322,22 +322,95 @@ main { max-width: 1180px; margin: 0 auto; }
   max-width: 680px;
 }
 
-/* "Josephine" — the name gets the iridescent gradient */
+/* “Josephine” — liquid flowing gradient */
 .hero h1 .name-gradient {
   display: block;
-  background: var(--grad-main);
+  /* 6-stop multicolor mimicking the 3D blob palette */
+  background: linear-gradient(
+    -45deg,
+    #d4ff62,
+    #00f5c8,
+    #38bdf8,
+    #a855f7,
+    #ff6b6b,
+    #ffd93d,
+    #00f5c8,
+    #d4ff62
+  );
+  background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* Subtle shimmer animation */
-  background-size: 200% 200%;
-  animation: shimmer 5s ease infinite;
+  animation: liquid-flow 7s ease-in-out infinite;
+  /* Give the letters a very subtle glow via drop-shadow */
+  filter: drop-shadow(0 0 32px rgba(0,245,200,.18));
 }
 
+@keyframes liquid-flow {
+  0%   { background-position: 0%   50%; }
+  15%  { background-position: 50%  0%;  }
+  30%  { background-position: 100% 50%; }
+  50%  { background-position: 100% 100%;}
+  65%  { background-position: 50%  100%;}
+  80%  { background-position: 0%   50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* shimmer stays for other elements */
 @keyframes shimmer {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* ── 5 Gradient Style Variants ──
+   Applied randomly by JS to .note h2, .belief-text, etc.
+   Each uses background-size 300% 300% + liquid-flow or shimmer */
+
+/* Style 1: Acid — green → teal */
+.gs-acid {
+  background: linear-gradient(-45deg, #d4ff62, #00f5c8, #22d3ee, #d4ff62) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: liquid-flow 6s ease-in-out infinite !important;
+}
+/* Style 2: Aurora — teal → indigo → fuchsia */
+.gs-aurora {
+  background: linear-gradient(-45deg, #00f5c8, #818cf8, #e879f9, #00f5c8) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: liquid-flow 7s ease-in-out infinite !important;
+}
+/* Style 3: Ember — gold → coral → violet */
+.gs-ember {
+  background: linear-gradient(-45deg, #ffd93d, #ff6b6b, #c026d3, #ffd93d) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: liquid-flow 8s ease-in-out infinite !important;
+}
+/* Style 4: Frost — white → sky → teal */
+.gs-frost {
+  background: linear-gradient(-45deg, #f0f9ff, #38bdf8, #00f5c8, #f0f9ff) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: liquid-flow 5s ease-in-out infinite !important;
+}
+/* Style 5: Solar — lime → amber → rose */
+.gs-solar {
+  background: linear-gradient(-45deg, #a3e635, #fb923c, #f43f5e, #a3e635) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: liquid-flow 9s ease-in-out infinite !important;
 }
 
 .hero-bottom {
@@ -568,16 +641,11 @@ main { max-width: 1180px; margin: 0 auto; }
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: 14px;
-  background: var(--grad-subtle);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  transition: background-position .4s;
+  /* gradient applied by JS gs-* class */
 }
 
 .note:hover h2 {
-  background-position: 100% 50%;
+  /* hover handled by gs-* animation speed-up would need JS — keep static */
 }
 
 .note p {
@@ -922,7 +990,123 @@ main { max-width: 1180px; margin: 0 auto; }
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
+/* ── Worldview Essay ── */
+.worldview-section {
+  padding: 100px 0 80px;
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+
+/* Subtle radial glow behind the section */
+.worldview-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,255,98,.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.essay-wrap {
+  max-width: 720px;
+}
+
+/* Pull quote — the centerpiece */
+.pull-quote {
+  margin: 28px 0 56px;
+  font-size: clamp(30px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  border: none;
+  padding: 0;
+  color: rgba(246,244,232,.85);
+}
+
+.pull-quote em {
+  font-style: normal;
+  background: linear-gradient(-45deg, #d4ff62, #00f5c8, #38bdf8, #a855f7, #d4ff62);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: liquid-flow 8s ease-in-out infinite;
+}
+
+/* Body paragraphs */
+.essay-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.essay-graf {
+  font-size: clamp(15px, 1.65vw, 19px);
+  line-height: 1.88;
+  color: rgba(246,244,232,.58);
+  padding: 18px 0;
+  border-top: 1px solid rgba(246,244,232,.07);
+  transition: color .25s;
+}
+
+.essay-graf:hover {
+  color: rgba(246,244,232,.82);
+}
+
+.essay-graf.essay-last {
+  font-size: clamp(16px, 1.8vw, 21px);
+  font-weight: 600;
+  color: rgba(246,244,232,.78);
+  letter-spacing: -.01em;
+  line-height: 1.7;
+}
+
+/* Inline gradient key phrases */
+.essay-key {
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: shimmer 4s ease infinite;
+  font-weight: 600;
+}
+
+/* Footer signature */
+.essay-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(246,244,232,.1);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.essay-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(246,244,232,.4);
+  letter-spacing: .06em;
+}
+
+.essay-tags {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: .6;
+}
+
 /* ── Currently Section ── */
+
 .currently-section {
   padding: 60px 0 80px;
   border-top: 1px solid var(--line);
@@ -983,7 +1167,149 @@ main { max-width: 1180px; margin: 0 auto; }
   color: rgba(246,244,232,.9);
 }
 
+/* ── Hero Stats Strip ── */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 52px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  max-width: 520px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.stat-num {
+  font-size: clamp(24px, 3.5vw, 40px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: shimmer 4s ease infinite;
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(246,244,232,.4);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+/* ── Stack Section ── */
+.stack-section {
+  padding: 80px 0 60px;
+  border-top: 1px solid var(--line);
+}
+
+.stack-sub {
+  max-width: 460px;
+  color: rgba(246,244,232,.55);
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 16px 0 36px;
+}
+
+.stack-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px 48px;
+}
+
+.stack-category {}
+
+.stack-cat-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(246,244,232,.35);
+  margin-bottom: 10px;
+}
+
+.stack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.stack-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(246,244,232,.14);
+  background: rgba(246,244,232,.04);
+  color: rgba(246,244,232,.7);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  transition: border-color .22s, background .22s, color .22s, transform .18s var(--ease-snap);
+}
+
+.stack-pill:hover {
+  border-color: rgba(212,255,98,.35);
+  background: rgba(212,255,98,.07);
+  color: var(--fg);
+  transform: translateY(-2px);
+}
+
+/* Accented pill variants */
+.pill-acid {
+  border-color: rgba(212,255,98,.28);
+  color: rgba(212,255,98,.85);
+  background: rgba(212,255,98,.06);
+}
+.pill-acid:hover {
+  border-color: rgba(212,255,98,.6);
+  background: rgba(212,255,98,.12);
+  color: var(--acid);
+}
+
+.pill-cool {
+  border-color: rgba(56,189,248,.25);
+  color: rgba(56,189,248,.8);
+  background: rgba(56,189,248,.05);
+}
+.pill-cool:hover {
+  border-color: rgba(56,189,248,.5);
+  background: rgba(56,189,248,.1);
+  color: #38bdf8;
+}
+
+.pill-warm {
+  border-color: rgba(168,85,247,.25);
+  color: rgba(168,85,247,.8);
+  background: rgba(168,85,247,.05);
+}
+.pill-warm:hover {
+  border-color: rgba(168,85,247,.5);
+  background: rgba(168,85,247,.1);
+  color: #a855f7;
+}
+
 /* Footer WeChat button */
+
 
 .footer-wechat {
   background: none;

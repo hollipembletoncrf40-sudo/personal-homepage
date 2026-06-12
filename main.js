@@ -144,6 +144,38 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('revealed'));
   }, 120);
+
+  // ── Random gradient styles for headings ──
+  const gsStyles = ['gs-acid', 'gs-aurora', 'gs-ember', 'gs-frost', 'gs-solar'];
+
+  // Card h2 headings — each gets a different style
+  const cardH2s = document.querySelectorAll('.note h2');
+  cardH2s.forEach((el, i) => {
+    el.classList.add(gsStyles[i % gsStyles.length]);
+  });
+
+  // Belief texts — alternate through styles
+  const beliefs = document.querySelectorAll('.belief-text');
+  beliefs.forEach((el, i) => {
+    el.classList.add(gsStyles[i % gsStyles.length]);
+  });
+
+  // Currently labels — already gradient, skip (keep brand consistency)
+  // Manifesto em tags — already animated, skip
+
+  // Stack category labels — subtle assignment
+  const catLabels = document.querySelectorAll('.stack-cat-label');
+  catLabels.forEach((el, i) => {
+    // Just add a lighter gradient version
+    const style = gsStyles[(i * 2) % gsStyles.length];
+    el.classList.add(style);
+    el.style.fontSize = '10px';
+    el.style.letterSpacing = '.14em';
+  });
+
+  // Manifesto text big body — random style
+  const mLabel = document.querySelector('.manifesto-label');
+  if (mLabel) mLabel.classList.add(gsStyles[Math.floor(Math.random() * gsStyles.length)]);
 });
 
 // ══════════════════════════════════════
@@ -170,6 +202,10 @@ function setLang(lang) {
   btn.textContent = lang === 'en' ? '中文' : 'EN';
   // Update html lang attribute
   document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+
+  // Toggle essay versions
+  document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
+  document.querySelectorAll('.lang-zh').forEach(el => el.style.display = lang === 'zh' ? '' : 'none');
 }
 
 document.getElementById('langBtn').addEventListener('click', () => {
@@ -177,7 +213,43 @@ document.getElementById('langBtn').addEventListener('click', () => {
 });
 
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// Animated Stat Counters
+// ══════════════════════════════════════
+(function () {
+  const statEls = document.querySelectorAll('.stat-num[data-target]');
+  if (!statEls.length) return;
+
+  function animateCount(el) {
+    const target = parseInt(el.dataset.target, 10);
+    const duration = 1400;
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(eased * target);
+      if (t < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  statEls.forEach(el => observer.observe(el));
+})();
+
+// ══════════════════════════════════════
 // WeChat QR Modal
+
 // ══════════════════════════════════════
 const overlay  = document.getElementById('qrOverlay');
 const closeBtn = document.getElementById('qrClose');

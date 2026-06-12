@@ -48,9 +48,10 @@
           <span class="clock-time" id="clock">--:--:--</span>
         </div>
         <nav class="nav">
-          <a href="#about"    data-en="About"   data-zh="关于">About</a>
-          <a href="#journey"  data-en="Journey" data-zh="旅程">Journey</a>
-          <a href="#beliefs"  data-en="Beliefs" data-zh="理念">Beliefs</a>
+          <a href="#about"    data-en="About"    data-zh="关于">About</a>
+          <a href="#currently" data-en="Now"     data-zh="当下">Now</a>
+          <a href="#stack"    data-en="Stack"    data-zh="工具">Stack</a>
+          <a href="#beliefs"  data-en="Beliefs"  data-zh="理念">Beliefs</a>
           <button class="lang-btn" id="langBtn">中文</button>
         </nav>
       </header>
@@ -75,9 +76,9 @@
 
           <div class="hero-bottom reveal" style="--reveal-delay:200ms">
             <p class="hero-copy"
-               data-en="Explorer living in Shenzhen. I'm learning, investing, and building in the AI era — not just watching it happen. Always tinkering, always growing. Looking for like-minded souls."
-               data-zh="深圳探索者。我在 AI 时代学习、投资、构建——而不仅仅是旁观。永远在折腾，永远在成长。寻找志同道合的朋友。">
-              Explorer living in Shenzhen. I'm learning, investing, and building in the AI era — not just watching it happen. Always tinkering, always growing. Looking for like-minded souls.
+               data-en="Explorer at the intersection of AI, Web3 &amp; intelligent investing. Living in Shenzhen. Building in public, learning in public, growing with anyone who cares."
+               data-zh="深圳探索者，活在 AI、Web3 与智慧投资的交叉点。公开构建，公开学习，与一切在意的人共同成长。">
+              Explorer at the intersection of AI, Web3 &amp; intelligent investing. Living in Shenzhen. Building in public, learning in public, growing with anyone who cares.
             </p>
             <div class="hero-actions">
               <button class="primary-action" id="heroWechatBtn">
@@ -88,6 +89,29 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
                 <span data-en="Email" data-zh="邮件">Email</span>
               </a>
+            </div>
+          </div>
+
+          <!-- Animated stats strip -->
+          <div class="hero-stats reveal" style="--reveal-delay:360ms">
+            <div class="stat-item">
+              <span class="stat-num" data-target="365">0</span>
+              <span class="stat-label" data-en="Days Learning" data-zh="天学习">Days Learning</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num" data-target="12">0</span>
+              <span class="stat-label" data-en="Projects Built" data-zh="个项目">Projects Built</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num" data-target="8">0</span>
+              <span class="stat-label" data-en="Summits" data-zh="座山峰">Summits</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num" data-target="24">0</span>
+              <span class="stat-label" data-en="Books Read" data-zh="本书">Books Read</span>
             </div>
           </div>
 
@@ -142,9 +166,114 @@
           </p>
         </section>
 
+        <!-- ── Focus Cards ── -->
+        <section id="focus">
+          <div class="note-grid">
+            <article class="note reveal" style="--reveal-delay:0ms">
+              <div class="note-index">01</div>
+              <h2 data-en="AI & VibeCoding" data-zh="AI 与 VibeCoding">AI & VibeCoding</h2>
+              <p data-en="Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems." data-zh="用 AI 构建产品——不需要传统工程经验。提示、迭代、发布。从副业项目到解决真实问题的工具。">
+                Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems.
+              </p>
+              <p class="note-tags">CURSOR · CLAUDE · VITE · SHIP FAST</p>
+            </article>
+
+            <article class="note reveal" style="--reveal-delay:80ms">
+              <div class="note-index">02</div>
+              <h2 data-en="Investing" data-zh="投资">Investing</h2>
+              <p data-en="Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle." data-zh="股票、加密货币与链上资产。长期思维，价值心态。让耐心与知识一起复利。每个市场周期都在持续学习。">
+                Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle.
+              </p>
+              <p class="note-tags">EQUITIES · BTC · ETH · DCA · RWA</p>
+            </article>
+
+            <article class="note reveal" style="--reveal-delay:160ms">
+              <div class="note-index">03</div>
+              <h2 data-en="Web3 & DeFi" data-zh="Web3 与 DeFi">Web3 & DeFi</h2>
+              <p data-en="Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention." data-zh="探索链上协议、DeFi 收益、DAO 和自主权金融。还在早期——信号强，噪音更强。值得关注。">
+                Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention.
+              </p>
+              <p class="note-tags">DEFI · DAO · L2 · ON-CHAIN</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ── Worldview Essay ── -->
+        <section class="worldview-section" id="worldview">
+
+          <!-- EN version -->
+          <div class="essay-wrap reveal lang-en">
+            <p class="manifesto-label">// MY WORLD</p>
+            <blockquote class="pull-quote">
+              This is <em>the best of times</em>.<br/>
+              This is <em>the worst of times</em>.<br/>
+              I choose to be <em>prepared</em>.
+            </blockquote>
+            <div class="essay-body">
+              <p class="essay-graf">
+                I'm a <span class="essay-key">00s kid</span> who grew up with the internet and came of age in the AI era. We inherited tools that previous generations could only dream of — and with them, a world noisier than any that came before.
+              </p>
+              <p class="essay-graf">
+                I read <span class="essay-key">existentialism</span> and history not as escapism, but as orientation. Human nature doesn't change. Power shifts, technology evolves, empires rise and collapse — but the patterns underneath stay the same. Those who read history aren't surprised by the present.
+              </p>
+              <p class="essay-graf">
+                <span class="essay-key">Business building</span> fascinates me in the deepest way. Not as a vehicle for wealth, but as the most direct act of creation available to an ordinary person. To build something from nothing — a product, a community, a system — is to leave a real mark on the world. The universe is vast and meant to be experienced. I intend to experience all of it.
+              </p>
+              <p class="essay-graf">
+                <span class="essay-key">Compound interest</span> is my core operating principle. Not just in finance — but in skills, trust, knowledge, relationships. Every habit, every page, every shipped project is a deposit. The math is patient. The results are not obvious until they suddenly are.
+              </p>
+              <p class="essay-graf">
+                Opportunities in this era are not scarce. They are <span class="essay-key">invisible to those who wait</span>, and obvious to those who have been quietly preparing. I am a believer in the long game — in the compounding power of consistent, unglamorous daily work.
+              </p>
+              <p class="essay-graf essay-last">
+                The future belongs to those who build it. I'm building mine — one day, one decision, one system at a time.
+              </p>
+            </div>
+            <div class="essay-footer">
+              <span class="essay-meta">Josephine &nbsp;·&nbsp; Gen Z &nbsp;·&nbsp; Shenzhen &nbsp;·&nbsp; 2026</span>
+              <span class="essay-tags">Existentialism · Compounding · Builder Mindset</span>
+            </div>
+          </div>
+
+          <!-- ZH version -->
+          <div class="essay-wrap reveal lang-zh" style="display:none">
+            <p class="manifesto-label">// 我的世界观</p>
+            <blockquote class="pull-quote">
+              这是<em>最好的时代</em>，<br/>
+              也是<em>最坏的时代</em>。<br/>
+              我选择<em>默默准备</em>。
+            </blockquote>
+            <div class="essay-body">
+              <p class="essay-graf">
+                我是 <span class="essay-key">00 后</span>，生于互联网，长于 AI 时代。我们继承了前人梦寐以求的工具——但这也是人类历史上噪音最响的时代。
+              </p>
+              <p class="essay-graf">
+                我读<span class="essay-key">存在主义</span>，读历史，读人性——不是逃避，而是找坐标。人性不变，技术更迭，帝国兴衰，但底层的规律始终如一。读懂历史的人，不会被当下吓到。
+              </p>
+              <p class="essay-graf">
+                <span class="essay-key">商业构建</span>让我着迷，不是因为钱，而是因为它是普通人能做到的最接近创造的事。从无到有——产品、社区、系统——是在宇宙留下印记最直接的方式。大千世界本来就是来体验的，我打算把它体验个彻底。
+              </p>
+              <p class="essay-graf">
+                <span class="essay-key">复利</span>是我最深的信仰。不只是利息，是技能、信任、认知和关系的叠加。每一个习惯、每一页书、每一个发布的项目，都是一笔存款。数学很有耐心，结果不显山露水——直到某天突然显现。
+              </p>
+              <p class="essay-graf">
+                这个时代的机会从不稀缺。它对<span class="essay-key">等待的人不可见</span>，对默默准备的人却无处不在。我相信孙学、信仰长期主义——相信每天枯燥而坚定的积累，终将产生不可思议的力量。
+              </p>
+              <p class="essay-graf essay-last">
+                未来由自己创造。我正在构建我的——一天、一个决定、一套系统。
+              </p>
+            </div>
+            <div class="essay-footer">
+              <span class="essay-meta">Josephine &nbsp;·&nbsp; 00后 &nbsp;·&nbsp; 深圳 &nbsp;·&nbsp; 2026</span>
+              <span class="essay-tags">存在主义 · 复利 · 构建者心态</span>
+            </div>
+          </div>
+
+        </section>
+
         <!-- ── Currently ── -->
-        <section class="currently-section reveal">
-          <p class="manifesto-label" data-en="// CURRENTLY" data-zh="// 当下">// CURRENTLY</p>
+        <section class="currently-section reveal" id="currently">
+          <p class="manifesto-label" data-en="// NOW" data-zh="// 当下">// NOW</p>
           <div class="currently-grid">
             <div class="currently-item">
               <span class="currently-icon">🔨</span>
@@ -185,43 +314,58 @@
               <span class="currently-icon">⚙️</span>
               <div>
                 <span class="currently-label" data-en="System" data-zh="系统构建">System</span>
-                <span class="currently-val" data-en="Personal knowledge base · Second brain setup · Workflow automation" data-zh="个人知识库 · 第二大脑 · 工作流自动化">Personal knowledge base · Second brain · Workflow automation</span>
+                <span class="currently-val" data-en="Personal knowledge base · Second brain · Workflow automation" data-zh="个人知识库 · 第二大脑 · 工作流自动化">Personal knowledge base · Second brain · Workflow automation</span>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- ── Journey Cards ── -->
-        <section id="journey">
-          <div class="note-grid">
-            <article class="note reveal" style="--reveal-delay:0ms">
-              <div class="note-index">01</div>
-              <h2 data-en="AI & VibeCoding" data-zh="AI 与 VibeCoding">AI & VibeCoding</h2>
-              <p data-en="Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems." data-zh="用 AI 构建产品——不需要传统工程经验。提示、迭代、发布。从副业项目到解决真实问题的工具。">
-                Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems.
-              </p>
-              <p class="note-tags">CURSOR · CLAUDE · VITE · SHIP FAST</p>
-            </article>
-
-            <article class="note reveal" style="--reveal-delay:80ms">
-              <div class="note-index">02</div>
-              <h2 data-en="Investing" data-zh="投资">Investing</h2>
-              <p data-en="Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle." data-zh="股票、加密货币与链上资产。长期思维，价值心态。让耐心与知识一起复利。每个市场周期都在持续学习。">
-                Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle.
-              </p>
-              <p class="note-tags">EQUITIES · BTC · ETH · DCA · RWA</p>
-            </article>
-
-            <article class="note reveal" style="--reveal-delay:160ms">
-              <div class="note-index">03</div>
-              <h2 data-en="Web3 & DeFi" data-zh="Web3 与 DeFi">Web3 & DeFi</h2>
-              <p data-en="Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention." data-zh="探索链上协议、DeFi 收益、DAO 和自主权金融。还在早期——信号强，噪音更强。值得关注。">
-                Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention.
-              </p>
-              <p class="note-tags">DEFI · DAO · L2 · ON-CHAIN</p>
-            </article>
+        <!-- ── Stack ── -->
+        <section class="stack-section reveal" id="stack">
+          <p class="manifesto-label" data-en="// MY STACK" data-zh="// 我的工具">// MY STACK</p>
+          <p class="stack-sub reveal" data-en="Tools that make me faster, clearer, and more effective every day." data-zh="让我每天更快、更清晰、更高效的工具。">Tools that make me faster, clearer, and more effective every day.</p>
+          <div class="stack-categories">
+            <div class="stack-category reveal" style="--reveal-delay:0ms">
+              <span class="stack-cat-label" data-en="AI & Dev" data-zh="AI 与开发">AI & Dev</span>
+              <div class="stack-pills">
+                <span class="stack-pill pill-acid">Claude</span>
+                <span class="stack-pill pill-acid">Cursor</span>
+                <span class="stack-pill">ChatGPT</span>
+                <span class="stack-pill">Perplexity</span>
+                <span class="stack-pill">Antigravity</span>
+              </div>
+            </div>
+            <div class="stack-category reveal" style="--reveal-delay:80ms">
+              <span class="stack-cat-label" data-en="Knowledge" data-zh="知识管理">Knowledge</span>
+              <div class="stack-pills">
+                <span class="stack-pill pill-cool">Obsidian</span>
+                <span class="stack-pill pill-cool">Notion</span>
+                <span class="stack-pill">Readwise</span>
+                <span class="stack-pill">Apple Notes</span>
+              </div>
+            </div>
+            <div class="stack-category reveal" style="--reveal-delay:160ms">
+              <span class="stack-cat-label" data-en="Finance" data-zh="投资工具">Finance</span>
+              <div class="stack-pills">
+                <span class="stack-pill pill-warm">TradingView</span>
+                <span class="stack-pill pill-warm">DeBank</span>
+                <span class="stack-pill">OKX</span>
+                <span class="stack-pill">Binance</span>
+              </div>
+            </div>
+            <div class="stack-category reveal" style="--reveal-delay:240ms">
+              <span class="stack-cat-label" data-en="Productivity" data-zh="效率">Productivity</span>
+              <div class="stack-pills">
+                <span class="stack-pill">Raycast</span>
+                <span class="stack-pill">Arc</span>
+                <span class="stack-pill">Telegram</span>
+                <span class="stack-pill">Things 3</span>
+              </div>
+            </div>
           </div>
         </section>
+
+        <!-- ── Beliefs ── -->
         <section class="beliefs reveal" id="beliefs">
           <p class="manifesto-label" data-en="// WHAT I BELIEVE" data-zh="// 我的信念">// WHAT I BELIEVE</p>
           <ul class="belief-list">
@@ -244,6 +388,10 @@
             <li class="belief-item">
               <span class="belief-num">05</span>
               <span class="belief-text" data-en="Simplicity is the ultimate sophistication." data-zh="简单，是最高级的复杂。">Simplicity is the ultimate sophistication.</span>
+            </li>
+            <li class="belief-item">
+              <span class="belief-num">06</span>
+              <span class="belief-text" data-en="Volatility is tuition. Pay it willingly." data-zh="波动是学费。心甘情愿地交。">Volatility is tuition. Pay it willingly.</span>
             </li>
           </ul>
         </section>
@@ -281,7 +429,7 @@
           <a href="mailto:hollipembletoncrf40@gmail.com" class="footer-link">Gmail</a>
         </div>
         <div class="footer-right">
-        <span>© 2026 Josephine</span>
+          <span>© 2026 Josephine</span>
         </div>
       </footer>
     </div>
