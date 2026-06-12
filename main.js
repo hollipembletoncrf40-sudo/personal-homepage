@@ -422,91 +422,145 @@ document.addEventListener('keydown', e => {
   const originalPos = new Float32Array(positionAttr.array.length);
   originalPos.set(positionAttr.array);
 
-  // ── Shader Material (iridescent) ──
+  // ── Shader Material — Fiber Bundle ──
   const material = new THREE.ShaderMaterial({
     uniforms: {
-      uTime: { value: 0 },
+      uTime:       { value: 0 },
+      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
     },
     vertexShader: `
       varying vec3 vNormal;
       varying vec3 vPosition;
-      varying float vNoise;
+      varying vec3 vWorldPos;
+      varying vec2 vUv;
       uniform float uTime;
 
+      // Multi-octave displacement for organic silhouette
+      float displace(vec3 p, float t) {
+        float n  = sin(p.x * 2.1 + t * 0.55) * cos(p.y * 1.8 - t * 0.38) * sin(p.z * 2.4 + t * 0.47) * 0.26;
+        float n2 = sin(p.x * 4.2 + p.y * 3.1 + t * 0.9)  * 0.10;
+        float n3 = cos(p.y * 5.0 + p.z * 3.8 - t * 0.62) * 0.07;
+        float n4 = sin(p.z * 3.3 - p.x * 2.7 + t * 1.1)  * 0.05;
+        return n + n2 + n3 + n4;
+      }
+
       void main() {
-        vNormal = normalize(normalMatrix * normal);
+        vUv      = uv;
+        vNormal  = normalize(normalMatrix * normal);
         vPosition = position;
+        vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
 
-        // Simple animated displacement
-        float noise = sin(position.x * 2.0 + uTime * 0.6)
-                    * cos(position.y * 1.8 - uTime * 0.4)
-                    * sin(position.z * 2.2 + uTime * 0.5)
-                    * 0.28
-                    + sin(position.x * 3.5 + position.y * 2.8 + uTime * 0.9) * 0.12;
-
-        vNoise = noise;
-        vec3 newPos = position + normal * noise;
-
+        float d = displace(position, uTime);
+        vec3 newPos = position + normal * d;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
       }
     `,
     fragmentShader: `
       varying vec3 vNormal;
       varying vec3 vPosition;
-      varying float vNoise;
+      varying vec3 vWorldPos;
+      varying vec2 vUv;
       uniform float uTime;
 
-      // Rich multi-stop palette: dark navy → deep purple → violet →
-      //   hot teal → acid green → gold → back
-      vec3 palette(float t) {
-        // Layer two cosine palettes and blend for more bands
-        vec3 a1 = vec3(0.20, 0.30, 0.55);
-        vec3 b1 = vec3(0.55, 0.40, 0.45);
-        vec3 c1 = vec3(1.00, 0.80, 0.55);
-        vec3 d1 = vec3(0.00, 0.25, 0.60);
-        vec3 col1 = a1 + b1 * cos(6.28318 * (c1 * t + d1));
+      // ── 8-stop cosine palette (Inigo Quilez style) ──
+      vec3 pal(float t) {
+        // Palette A: teal → purple → lime
+        vec3 a1 = vec3(0.15, 0.40, 0.60);
+        vec3 b1 = vec3(0.60, 0.45, 0.40);
+        vec3 c1 = vec3(1.00, 0.75, 0.50);
+        vec3 d1 = vec3(0.00, 0.20, 0.55);
+        vec3 c = a1 + b1 * cos(6.2832 * (c1 * t + d1));
 
-        vec3 a2 = vec3(0.10, 0.50, 0.35);
-        vec3 b2 = vec3(0.50, 0.45, 0.30);
-        vec3 c2 = vec3(0.80, 1.00, 0.70);
-        vec3 d2 = vec3(0.40, 0.10, 0.80);
-        vec3 col2 = a2 + b2 * cos(6.28318 * (c2 * t + d2));
+        // Palette B: coral → gold → cyan
+        vec3 a2 = vec3(0.55, 0.30, 0.10);
+        vec3 b2 = vec3(0.45, 0.50, 0.55);
+        vec3 c2 = vec3(0.70, 0.90, 1.10);
+        vec3 d2 = vec3(0.35, 0.05, 0.75);
+        vec3 d = a2 + b2 * cos(6.2832 * (c2 * t + d2));
 
-        return mix(col1, col2, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.08));
+        // Blend palettes based on time — always shifting
+        return mix(c, d, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.09));
+      }
+
+      // ── Fiber strand function ──
+      // Fibers run along the φ (longitude) direction on the sphere surface.
+      // We carve thin bright lines out of the surface using fract + smoothstep.
+      float fiberStrand(vec3 p, float freq, float thickness, float offset) {
+        // Map position to a latitude-like coordinate (fiber axis)
+        float lon = atan(p.z, p.x) / 6.2832 + 0.5; // 0..1 around sphere
+        float lat = asin(clamp(p.y / 1.6, -1.0, 1.0)) / 3.14159 + 0.5;
+
+        // Fibers run in a spiral: longitude + twisted latitude
+        float spiral = lon * freq + lat * (freq * 0.37) + offset;
+        spiral = fract(spiral + uTime * 0.03);
+
+        // Sharp fiber line
+        float line = 1.0 - smoothstep(0.0, thickness, min(spiral, 1.0 - spiral));
+        return line;
       }
 
       void main() {
-        // Fresnel rim
-        vec3 viewDir = normalize(cameraPosition - vPosition);
-        float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.2);
+        vec3 viewDir = normalize(cameraPosition - vWorldPos);
+        float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.8);
 
-        // Animated colour coordinate
-        float t = vNoise * 0.6 + 0.5;
-        t += vPosition.y * 0.15 + vPosition.x * 0.08 + uTime * 0.05;
+        // ── Base iridescent colour ──
+        float tBase = vPosition.y * 0.22 + vPosition.x * 0.10
+                    + length(vPosition) * 0.15
+                    + uTime * 0.04;
+        vec3 baseCol = pal(tBase);
 
-        vec3 col = palette(t);
+        // ── Fiber layers (4 overlapping spiral sets) ──
+        // Different frequencies, thicknesses, rotational offsets, speeds
+        float f1 = fiberStrand(vPosition, 18.0, 0.035, 0.0);
+        float f2 = fiberStrand(vPosition, 12.0, 0.028, 0.33 + uTime * 0.008);
+        float f3 = fiberStrand(vPosition, 28.0, 0.020, 0.67 - uTime * 0.011);
+        // Cross-fibers (rotated frame — swap x/z)
+        vec3 rotP = vec3(vPosition.z, vPosition.y, -vPosition.x);
+        float f4 = fiberStrand(rotP, 14.0, 0.030, 0.5 + uTime * 0.006);
 
-        // Acid-green hot-spot in bright areas
-        float greenZone = smoothstep(0.48, 0.78, t);
-        col = mix(col, vec3(0.78, 1.00, 0.30), greenZone * 0.55);
+        // Combine fibers — each gets its own palette colour
+        float t1 = tBase + 0.00; vec3 fc1 = pal(t1) * 2.5;
+        float t2 = tBase + 0.25; vec3 fc2 = pal(t2) * 2.2;
+        float t3 = tBase + 0.50; vec3 fc3 = pal(t3) * 3.0;
+        float t4 = tBase + 0.75; vec3 fc4 = pal(t4) * 2.0;
 
-        // Gold / amber highlight band
-        float goldZone = smoothstep(0.72, 0.90, sin(t * 6.28 + uTime * 0.1) * 0.5 + 0.5);
-        col = mix(col, vec3(1.00, 0.78, 0.15), goldZone * 0.30);
+        vec3 fiberGlow = fc1 * f1 + fc2 * f2 + fc3 * f3 + fc4 * f4;
 
-        // Deep violet in dark areas
-        float darkZone = 1.0 - smoothstep(0.0, 0.45, t);
-        col = mix(col, vec3(0.28, 0.05, 0.60), darkZone * 0.45);
+        // ── Caustic / energy shimmer ──
+        float shimmer = sin(vPosition.x * 8.0 + uTime * 1.2)
+                      * sin(vPosition.y * 6.5 - uTime * 0.9)
+                      * sin(vPosition.z * 7.2 + uTime * 1.5);
+        shimmer = max(0.0, shimmer) * 0.4;
 
-        // Bright teal fresnel rim glow
-        col = mix(col, vec3(0.10, 0.95, 0.75), fresnel * 0.55);
+        // ── Colour hot-spots ──
+        vec3 acidGreen  = vec3(0.82, 1.00, 0.28);
+        vec3 hotCoral   = vec3(1.00, 0.35, 0.55);
+        vec3 electricCyan = vec3(0.15, 1.00, 0.88);
+        vec3 deepPurple = vec3(0.55, 0.10, 1.00);
 
-        // Exposure
-        float brightness = 0.55 + fresnel * 0.55 + max(vNoise, 0.0) * 0.35;
-        col *= brightness;
+        float gt = 0.5 + 0.5 * sin(uTime * 0.3 + vPosition.y * 2.0);
+        float ct = 0.5 + 0.5 * cos(uTime * 0.25 + vPosition.x * 1.5);
 
-        // Slight gamma lift so blacks aren't too muddy
-        col = pow(max(col, vec3(0.0)), vec3(0.88));
+        vec3 hotSpot = mix(hotCoral, acidGreen, gt) * 0.35
+                     + mix(electricCyan, deepPurple, ct) * 0.25;
+
+        // ── Rim glow layers ──
+        vec3 rimCol = mix(electricCyan, deepPurple, 0.5 + 0.5 * sin(uTime * 0.2));
+        vec3 rimGlow = rimCol * fresnel * 2.2;
+
+        // ── Assemble ──
+        vec3 col = baseCol * 0.45              // dim base (fibers sit on top)
+                 + fiberGlow * 0.70            // bright fiber strands
+                 + shimmer * electricCyan      // caustic flicker
+                 + hotSpot                     // colour accents
+                 + rimGlow;                    // electric rim
+
+        // Exposure & tone-map (simple Reinhard on luminance)
+        float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+        col = col / (1.0 + lum * 0.45);
+
+        // Gamma
+        col = pow(max(col, vec3(0.0)), vec3(0.85));
 
         gl_FragColor = vec4(col, 1.0);
       }
