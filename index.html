@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="JDK22 — AI · Java · Python 工程师" />
-    <title>Herb</title>
+    <meta name="description" content="Josephine — AI · Web3 · Investing · Learning · Growing Together" />
+    <title>Josephine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap" rel="stylesheet" />
@@ -12,52 +12,81 @@
   </head>
   <body>
 
-    <!-- Three.js Canvas -->
     <canvas id="threeCanvas"></canvas>
+
+    <!-- Custom cursor bubble -->
+    <div class="cursor-orb" id="cursorOrb"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <!-- WeChat QR Modal -->
+    <div class="qr-overlay" id="qrOverlay" role="dialog" aria-modal="true" aria-label="WeChat QR Code">
+      <div class="qr-modal">
+        <button class="qr-close" id="qrClose" aria-label="Close">✕</button>
+        <div class="qr-header">
+          <div class="qr-avatar">J</div>
+          <div>
+            <div class="qr-name">Josephine</div>
+            <div class="qr-location">广东 · 深圳</div>
+          </div>
+        </div>
+        <div class="qr-body">
+          <img src="wechat-qr.png" alt="WeChat QR Code" class="qr-img" />
+        </div>
+        <p class="qr-hint" data-en="Scan to add me on WeChat" data-zh="扫一扫，添加我为好友">Scan to add me on WeChat</p>
+        <div class="qr-tag-row">
+          <span class="qr-badge">WeChat</span>
+        </div>
+      </div>
+    </div>
 
     <div class="shell">
       <!-- Header -->
       <header class="site-header">
-        <a href="/" class="brand">herb</a>
+        <a href="/" class="brand">Josephine</a>
         <div class="header-clock">
           <span class="clock-label">GMT+8</span>
           <span class="clock-time" id="clock">--:--:--</span>
         </div>
         <nav class="nav">
-          <a href="#stack">Stack</a>
-          <a href="#projects">Projects</a>
-          <a href="#beliefs">Beliefs</a>
+          <a href="#about"    data-en="About"   data-zh="关于">About</a>
+          <a href="#journey"  data-en="Journey" data-zh="旅程">Journey</a>
+          <a href="#beliefs"  data-en="Beliefs" data-zh="理念">Beliefs</a>
+          <button class="lang-btn" id="langBtn">中文</button>
         </nav>
       </header>
 
       <main>
-        <!-- Hero Section -->
-        <section class="hero">
+        <!-- ── Hero ── -->
+        <section class="hero" id="about">
           <div class="hero-meta reveal">
             <span class="tag">AI</span>
             <span class="tag-sep">×</span>
-            <span class="tag">Java</span>
+            <span class="tag">WEB3</span>
             <span class="tag-sep">×</span>
-            <span class="tag">Python</span>
+            <span class="tag" data-en="INVESTING" data-zh="投资">INVESTING</span>
+            <span class="tag-sep">×</span>
+            <span class="tag">INTJ</span>
           </div>
 
-          <h1 class="reveal" style="--reveal-delay: 80ms">
-            I build things<br/>that think,<br/>scale, and persist.
+          <h1 class="reveal" style="--reveal-delay:80ms">
+            <span class="hero-hi" data-en="Hi, I'm" data-zh="你好，我是">Hi, I'm</span><br/>
+            <span class="name-gradient">Josephine.</span>
           </h1>
 
-          <div class="hero-bottom reveal" style="--reveal-delay: 200ms">
-            <p class="hero-copy">
-              Engineer focused on AI systems, Java backend services, and
-              Python automation — compressing complex systems into clear
-              interfaces and making language models genuinely useful.
+          <div class="hero-bottom reveal" style="--reveal-delay:200ms">
+            <p class="hero-copy"
+               data-en="Explorer living in Shenzhen. I'm learning, investing, and building in the AI era — not just watching it happen. Always tinkering, always growing. Looking for like-minded souls."
+               data-zh="深圳探索者。我在 AI 时代学习、投资、构建——而不仅仅是旁观。永远在折腾，永远在成长。寻找志同道合的朋友。">
+              Explorer living in Shenzhen. I'm learning, investing, and building in the AI era — not just watching it happen. Always tinkering, always growing. Looking for like-minded souls.
             </p>
             <div class="hero-actions">
-              <a href="mailto:me@jdk22.com" class="primary-action">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-                me@jdk22.com
-              </a>
-              <a href="#stack" class="secondary-action">
-                Explore stack
+              <button class="primary-action" id="heroWechatBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M2 8.5C2 4.91 6.48 2 12 2s10 2.91 10 6.5c0 3.2-2.93 5.88-7 6.37V18l-3.5-3H12c-5.52 0-10-2.91-10-6.5z"/></svg>
+                <span data-en="WeChat" data-zh="微信">WeChat</span>
+              </button>
+              <a href="mailto:325136185@qq.com" class="secondary-action">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                <span data-en="Email" data-zh="邮件">Email</span>
               </a>
             </div>
           </div>
@@ -68,115 +97,195 @@
           </div>
         </section>
 
-        <!-- Marquee / Stack -->
-        <div class="marquee-wrap" id="stack">
+        <!-- ── Marquee ── -->
+        <div class="marquee-wrap">
           <div class="marquee-track">
             <div class="marquee-content">
-              <span class="marquee-item">Java<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Python<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Spring Boot<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">LangChain<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">PostgreSQL<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Docker<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Kubernetes<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">OpenAI API<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Redis<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Kafka<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">VibeCoding<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">AI Tools<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item" data-en="Hiking" data-zh="徒步">Hiking<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Web3<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item" data-en="Reading" data-zh="读书">Reading<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item" data-en="Investing" data-zh="投资">Investing<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">INTJ<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item" data-en="System Building" data-zh="系统构建">System Building<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">DeFi<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item" data-en="Lifelong Learner" data-zh="终身学习者">Lifelong Learner<span class="marquee-dot">◆</span></span>
             </div>
             <div class="marquee-content" aria-hidden="true">
-              <span class="marquee-item">Java<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Python<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Spring Boot<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">LangChain<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">PostgreSQL<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Docker<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Kubernetes<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">OpenAI API<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Redis<span class="marquee-dot">◆</span></span>
-              <span class="marquee-item">Kafka<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">VibeCoding<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">AI Tools<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Hiking<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Web3<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Reading<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Investing<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">INTJ<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">System Building<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">DeFi<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Lifelong Learner<span class="marquee-dot">◆</span></span>
             </div>
           </div>
         </div>
 
-        <!-- Manifesto -->
+        <!-- ── Manifesto ── -->
         <section class="manifesto reveal">
-          <p class="manifesto-label">// WHAT I DO</p>
-          <p class="manifesto-text">
-            Compress <em>complexity</em> into<br/><em>clarity</em>.
+          <p class="manifesto-label" data-en="// MY MANIFESTO" data-zh="// 我的宣言">// MY MANIFESTO</p>
+          <p class="manifesto-text"
+             data-en="The AI era doesn't wait. <em>Learn</em> fast, <em>invest</em> wisely, <em>grow</em> together."
+             data-zh="AI 时代不等人。<em>快速</em>学习，<em>智慧</em>投资，<em>共同</em>成长。">
+            The AI era doesn't wait. <em>Learn</em> fast, <em>invest</em> wisely, <em>grow</em> together.
           </p>
-          <p class="manifesto-sub">
-            I work at the intersection of AI and backend engineering —
-            building systems that are reliable, observable, and genuinely useful.
-            No magic, just good engineering.
+          <p class="manifesto-sub"
+             data-en="Continuously building my own system. Making everything simpler. If you're on a similar journey, let's connect."
+             data-zh="持续打造自己的系统，让一切变得简单。如果你也在类似的旅途上，欢迎交流。">
+            Continuously building my own system. Making everything simpler. If you're on a similar journey, let's connect.
           </p>
         </section>
 
-        <!-- Projects -->
-        <section id="projects">
-          <div class="note-grid">
-            <article class="note reveal" style="--reveal-delay: 0ms">
-              <div class="note-index">01</div>
-              <h2>LLM Gateway</h2>
-              <p>A unified API gateway for multiple LLM providers with rate limiting, cost tracking, and fallback routing.</p>
-              <p class="note-tags">AI · JAVA · SPRING BOOT</p>
-            </article>
-            <article class="note reveal" style="--reveal-delay: 80ms">
-              <div class="note-index">02</div>
-              <h2>DocMind</h2>
-              <p>Document intelligence platform — upload any PDF, get structured extraction and Q&A powered by RAG.</p>
-              <p class="note-tags">PYTHON · LANGCHAIN · VECTOR DB</p>
-            </article>
-            <article class="note reveal" style="--reveal-delay: 160ms">
-              <div class="note-index">03</div>
-              <h2>StreamPipe</h2>
-              <p>Real-time data pipeline framework built on Kafka with Python DSL for defining transformation chains.</p>
-              <p class="note-tags">PYTHON · KAFKA · OPEN SOURCE</p>
-            </article>
+        <!-- ── Currently ── -->
+        <section class="currently-section reveal">
+          <p class="manifesto-label" data-en="// CURRENTLY" data-zh="// 当下">// CURRENTLY</p>
+          <div class="currently-grid">
+            <div class="currently-item">
+              <span class="currently-icon">🔨</span>
+              <div>
+                <span class="currently-label" data-en="Building" data-zh="正在构建">Building</span>
+                <span class="currently-val" data-en="Personal AI tools · VibeCoding side projects" data-zh="用 AI 打造个人工具 · VibeCoding 副业项目">Personal AI tools · VibeCoding side projects</span>
+              </div>
+            </div>
+            <div class="currently-item">
+              <span class="currently-icon">📖</span>
+              <div>
+                <span class="currently-label" data-en="Reading" data-zh="正在读">Reading</span>
+                <span class="currently-val" data-en="The Intelligence Trap · Poor Charlie's Almanack" data-zh="《智识的误区》 · 《穷查理宝典》">The Intelligence Trap · Poor Charlie's Almanack</span>
+              </div>
+            </div>
+            <div class="currently-item">
+              <span class="currently-icon">📡</span>
+              <div>
+                <span class="currently-label" data-en="Exploring" data-zh="正在探索">Exploring</span>
+                <span class="currently-val" data-en="On-chain AI agents · DeFi strategies · L2 ecosystem" data-zh="链上 AI 智能体 · DeFi 收益策略 · L2 生态">On-chain AI agents · DeFi strategies · L2 ecosystem</span>
+              </div>
+            </div>
+            <div class="currently-item">
+              <span class="currently-icon">🏔️</span>
+              <div>
+                <span class="currently-label" data-en="Outside" data-zh="户外">Outside</span>
+                <span class="currently-val" data-en="Shenzhen hiking trails · Planning next summit" data-zh="深圳徒步路线 · 规划下一条山线">Shenzhen hiking trails · Planning next summit</span>
+              </div>
+            </div>
+            <div class="currently-item">
+              <span class="currently-icon">🧠</span>
+              <div>
+                <span class="currently-label" data-en="Learning" data-zh="正在学">Learning</span>
+                <span class="currently-val" data-en="Prompt engineering · LLM fine-tuning · Web3 protocols" data-zh="提示词工程 · LLM 微调 · Web3 协议">Prompt engineering · LLM fine-tuning · Web3 protocols</span>
+              </div>
+            </div>
+            <div class="currently-item">
+              <span class="currently-icon">⚙️</span>
+              <div>
+                <span class="currently-label" data-en="System" data-zh="系统构建">System</span>
+                <span class="currently-val" data-en="Personal knowledge base · Second brain setup · Workflow automation" data-zh="个人知识库 · 第二大脑 · 工作流自动化">Personal knowledge base · Second brain · Workflow automation</span>
+              </div>
+            </div>
           </div>
         </section>
 
-        <!-- Beliefs -->
+        <!-- ── Journey Cards ── -->
+        <section id="journey">
+          <div class="note-grid">
+            <article class="note reveal" style="--reveal-delay:0ms">
+              <div class="note-index">01</div>
+              <h2 data-en="AI & VibeCoding" data-zh="AI 与 VibeCoding">AI & VibeCoding</h2>
+              <p data-en="Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems." data-zh="用 AI 构建产品——不需要传统工程经验。提示、迭代、发布。从副业项目到解决真实问题的工具。">
+                Building products with AI — no traditional engineering required. Prompt, iterate, ship. From side projects to real tools that solve real problems.
+              </p>
+              <p class="note-tags">CURSOR · CLAUDE · VITE · SHIP FAST</p>
+            </article>
+
+            <article class="note reveal" style="--reveal-delay:80ms">
+              <div class="note-index">02</div>
+              <h2 data-en="Investing" data-zh="投资">Investing</h2>
+              <p data-en="Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle." data-zh="股票、加密货币与链上资产。长期思维，价值心态。让耐心与知识一起复利。每个市场周期都在持续学习。">
+                Equities, crypto, and on-chain assets. Long-term thinking, value mindset. Compounding patience alongside knowledge. Still learning every market cycle.
+              </p>
+              <p class="note-tags">EQUITIES · BTC · ETH · DCA · RWA</p>
+            </article>
+
+            <article class="note reveal" style="--reveal-delay:160ms">
+              <div class="note-index">03</div>
+              <h2 data-en="Web3 & DeFi" data-zh="Web3 与 DeFi">Web3 & DeFi</h2>
+              <p data-en="Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention." data-zh="探索链上协议、DeFi 收益、DAO 和自主权金融。还在早期——信号强，噪音更强。值得关注。">
+                Exploring on-chain protocols, DeFi yields, DAOs, and self-sovereign finance. Early days — the signal is high, the noise is higher. Worth the attention.
+              </p>
+              <p class="note-tags">DEFI · DAO · L2 · ON-CHAIN</p>
+            </article>
+          </div>
+        </section>
         <section class="beliefs reveal" id="beliefs">
-          <p class="manifesto-label">// ENGINEERING BELIEFS</p>
+          <p class="manifesto-label" data-en="// WHAT I BELIEVE" data-zh="// 我的信念">// WHAT I BELIEVE</p>
           <ul class="belief-list">
             <li class="belief-item">
               <span class="belief-num">01</span>
-              <span class="belief-text">Complexity is a cost, not a feature</span>
+              <span class="belief-text" data-en="Knowledge compounds. Learn every day." data-zh="知识会复利。每天都要学习。">Knowledge compounds. Learn every day.</span>
             </li>
             <li class="belief-item">
               <span class="belief-num">02</span>
-              <span class="belief-text">Observability is not optional</span>
+              <span class="belief-text" data-en="AI is infrastructure. Master it or be replaced by it." data-zh="AI 是基础设施。掌握它，否则被它替代。">AI is infrastructure. Master it or be replaced by it.</span>
             </li>
             <li class="belief-item">
               <span class="belief-num">03</span>
-              <span class="belief-text">AI that can't be debugged can't be trusted</span>
+              <span class="belief-text" data-en="Own your assets. Own your keys. Own your future." data-zh="拥有你的资产。掌控你的私钥。掌握你的未来。">Own your assets. Own your keys. Own your future.</span>
             </li>
             <li class="belief-item">
               <span class="belief-num">04</span>
-              <span class="belief-text">Open source is how we eat</span>
+              <span class="belief-text" data-en="Community is leverage. Grow with others, not alone." data-zh="社区是杠杆。与他人共同成长，而不是独自前行。">Community is leverage. Grow with others, not alone.</span>
             </li>
             <li class="belief-item">
               <span class="belief-num">05</span>
-              <span class="belief-text">Ship it, then make it beautiful</span>
+              <span class="belief-text" data-en="Simplicity is the ultimate sophistication." data-zh="简单，是最高级的复杂。">Simplicity is the ultimate sophistication.</span>
             </li>
           </ul>
+        </section>
+
+        <!-- ── Connect ── -->
+        <section class="connect reveal">
+          <p class="manifesto-label" data-en="// LET'S GROW TOGETHER" data-zh="// 一起成长">// LET'S GROW TOGETHER</p>
+          <p class="connect-text"
+             data-en="INTJ · Shenzhen · Continuously learning, constantly building. If you're into AI, Web3, investing, or just enjoy geeking out — I'd love to connect."
+             data-zh="INTJ · 深圳 · 不断学习，持续构建。如果你也在研究 AI、Web3、投资，或者就是喜欢瞎折腾——欢迎来聊。">
+            INTJ · Shenzhen · Continuously learning, constantly building. If you're into AI, Web3, investing, or just enjoy geeking out — I'd love to connect.
+          </p>
+          <div class="connect-actions">
+            <button class="primary-action connect-wechat" id="connectWechatBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 10a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M2 8.5C2 4.91 6.48 2 12 2s10 2.91 10 6.5c0 3.2-2.93 5.88-7 6.37V18l-3.5-3H12c-5.52 0-10-2.91-10-6.5z"/></svg>
+              <span data-en="Add on WeChat" data-zh="添加微信">Add on WeChat</span>
+            </button>
+            <a href="mailto:325136185@qq.com" class="secondary-action">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+              <span data-en="QQ Mail" data-zh="QQ 邮件">QQ Mail</span>
+            </a>
+            <a href="mailto:hollipembletoncrf40@gmail.com" class="secondary-action">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+              Gmail
+            </a>
+          </div>
         </section>
       </main>
 
       <!-- Footer -->
       <footer class="footer">
         <div class="footer-center">
-          <a href="https://github.com/jdk22" class="footer-link" target="_blank">GitHub</a>
-          <a href="https://twitter.com/jdk22" class="footer-link" target="_blank">Twitter</a>
-          <a href="mailto:me@jdk22.com" class="footer-link">Email</a>
+          <button class="footer-link footer-wechat" id="footerWechatBtn">WeChat</button>
+          <a href="mailto:325136185@qq.com" class="footer-link">QQ</a>
+          <a href="mailto:hollipembletoncrf40@gmail.com" class="footer-link">Gmail</a>
         </div>
         <div class="footer-right">
-          <span>© 2026 herb</span>
+        <span>© 2026 Josephine</span>
         </div>
       </footer>
     </div>
 
-    <!-- Three.js via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="main.js"></script>
   </body>

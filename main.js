@@ -1,4 +1,117 @@
 // ══════════════════════════════════════
+// Custom Cursor — Morphing Gradient Ring
+// ══════════════════════════════════════
+(function () {
+  const ring = document.getElementById('cursorOrb');  // repurpose as ring
+  const dot  = document.getElementById('cursorDot');
+  if (!ring || !dot) return;
+
+  // Redesign ring element in JS (gradient border ring, not solid blob)
+  ring.style.cssText = `
+    position:fixed; top:0; left:0; z-index:99999;
+    width:38px; height:38px; border-radius:50%;
+    pointer-events:none; will-change:transform;
+    background: conic-gradient(from 0deg, #d4ff62, #00f5c8, #a855f7, #ff6b6b, #d4ff62) border-box;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
+    transition: opacity .2s;
+  `;
+
+  dot.style.cssText = `
+    position:fixed; top:0; left:0; z-index:100000;
+    width:5px; height:5px; border-radius:50%;
+    pointer-events:none; will-change:transform;
+    background:#d4ff62;
+    box-shadow: 0 0 6px 2px rgba(212,255,98,.7);
+  `;
+
+  let tx = window.innerWidth/2, ty = window.innerHeight/2;
+  let cx = tx, cy = ty;
+  let prevTx = tx, prevTy = ty;
+  let angle = 0;      // spinning gradient angle
+  let isHover = false;
+
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX;
+    ty = e.clientY;
+    dot.style.transform = `translate(${tx - 2.5}px, ${ty - 2.5}px)`;
+    spawnParticle(tx, ty);
+  });
+
+  // ── Particle trail ──
+  const particles = [];
+  function spawnParticle(x, y) {
+    const p = document.createElement('div');
+    const size = 3 + Math.random() * 4;
+    const colors = ['#d4ff62','#00f5c8','#a855f7','#ff6b6b','#38bdf8'];
+    const color  = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      position:fixed; pointer-events:none; z-index:99998;
+      width:${size}px; height:${size}px; border-radius:50%;
+      background:${color}; opacity:.7;
+      left:${x - size/2}px; top:${y - size/2}px;
+      transform:scale(1); transition: opacity .5s, transform .5s;
+    `;
+    document.body.appendChild(p);
+    particles.push(p);
+    requestAnimationFrame(() => {
+      p.style.opacity  = '0';
+      p.style.transform = `scale(0) translate(${(Math.random()-0.5)*20}px, ${(Math.random()-0.5)*20}px)`;
+    });
+    setTimeout(() => { p.remove(); }, 550);
+  }
+
+  // ── Grow on interactive ──
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      isHover = true;
+      ring.style.opacity = '1';
+    });
+    el.addEventListener('mouseleave', () => {
+      isHover = false;
+      ring.style.opacity = '0.85';
+    });
+  });
+
+  document.addEventListener('mouseleave', () => { ring.style.opacity='0'; dot.style.opacity='0'; });
+  document.addEventListener('mouseenter', () => { ring.style.opacity='0.85'; dot.style.opacity='1'; });
+
+  // ── RAF loop ──
+  function loop() {
+    requestAnimationFrame(loop);
+
+    // Fast follow (lerp 0.35 → snappy but still smooth)
+    const lerpT = isHover ? 0.42 : 0.35;
+    cx += (tx - cx) * lerpT;
+    cy += (ty - cy) * lerpT;
+
+    // Velocity for squish
+    const vx = tx - prevTx;
+    const vy = ty - prevTy;
+    prevTx = tx; prevTy = ty;
+    const speed  = Math.sqrt(vx*vx + vy*vy);
+    const dir    = Math.atan2(vy, vx) * (180/Math.PI);
+    const stretch = Math.min(1 + speed * 0.045, 2.0);
+    const squeeze = 1 / stretch;
+
+    // Spinning gradient angle
+    angle = (angle + 1.8) % 360;
+    ring.style.background = `conic-gradient(from ${angle}deg, #d4ff62, #00f5c8, #a855f7, #ff6b6b, #d4ff62) border-box`;
+    ring.style['-webkit-mask'] = `radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px))`;
+    ring.style['mask']         = `radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px))`;
+
+    const w = isHover ? 56 : 38;
+    const h = isHover ? 56 : 38;
+    ring.style.transform = `translate(${cx - w/2}px, ${cy - h/2}px) rotate(${dir}deg) scaleX(${stretch}) scaleY(${squeeze})`;
+    ring.style.width  = w + 'px';
+    ring.style.height = h + 'px';
+  }
+  loop();
+})();
+
+
+
+// ══════════════════════════════════════
 // Clock
 // ══════════════════════════════════════
 function updateClock() {
@@ -10,6 +123,7 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 1000);
+
 
 // ══════════════════════════════════════
 // Reveal on Scroll
@@ -30,6 +144,63 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('revealed'));
   }, 120);
+});
+
+// ══════════════════════════════════════
+// Language Switch (EN ↔ ZH)
+// ══════════════════════════════════════
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const btn = document.getElementById('langBtn');
+
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const text = el.getAttribute(`data-${lang}`);
+    if (!text) return;
+    // If content has HTML (em tags etc), use innerHTML carefully
+    if (text.includes('<')) {
+      el.innerHTML = text;
+    } else {
+      el.textContent = text;
+    }
+  });
+
+  // Toggle button label
+  btn.textContent = lang === 'en' ? '中文' : 'EN';
+  // Update html lang attribute
+  document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+}
+
+document.getElementById('langBtn').addEventListener('click', () => {
+  setLang(currentLang === 'en' ? 'zh' : 'en');
+});
+
+// ══════════════════════════════════════
+// WeChat QR Modal
+// ══════════════════════════════════════
+const overlay  = document.getElementById('qrOverlay');
+const closeBtn = document.getElementById('qrClose');
+
+function openQR()  { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeQR() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+// All buttons that open the QR
+['heroWechatBtn', 'connectWechatBtn', 'footerWechatBtn'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', openQR);
+});
+
+closeBtn.addEventListener('click', closeQR);
+
+// Close on backdrop click
+overlay.addEventListener('click', e => {
+  if (e.target === overlay) closeQR();
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeQR();
 });
 
 // ══════════════════════════════════════
@@ -104,35 +275,57 @@ window.addEventListener('load', () => {
       varying float vNoise;
       uniform float uTime;
 
+      // Rich multi-stop palette: dark navy → deep purple → violet →
+      //   hot teal → acid green → gold → back
       vec3 palette(float t) {
-        // Iridescent: deep teal → acid green → purple → blue
-        vec3 a = vec3(0.15, 0.45, 0.30);
-        vec3 b = vec3(0.45, 0.40, 0.25);
-        vec3 c = vec3(1.00, 0.90, 0.60);
-        vec3 d = vec3(0.10, 0.35, 0.55);
-        return a + b * cos(6.28318 * (c * t + d));
+        // Layer two cosine palettes and blend for more bands
+        vec3 a1 = vec3(0.20, 0.30, 0.55);
+        vec3 b1 = vec3(0.55, 0.40, 0.45);
+        vec3 c1 = vec3(1.00, 0.80, 0.55);
+        vec3 d1 = vec3(0.00, 0.25, 0.60);
+        vec3 col1 = a1 + b1 * cos(6.28318 * (c1 * t + d1));
+
+        vec3 a2 = vec3(0.10, 0.50, 0.35);
+        vec3 b2 = vec3(0.50, 0.45, 0.30);
+        vec3 c2 = vec3(0.80, 1.00, 0.70);
+        vec3 d2 = vec3(0.40, 0.10, 0.80);
+        vec3 col2 = a2 + b2 * cos(6.28318 * (c2 * t + d2));
+
+        return mix(col1, col2, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.08));
       }
 
       void main() {
-        // Fresnel
+        // Fresnel rim
         vec3 viewDir = normalize(cameraPosition - vPosition);
-        float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.5);
+        float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.2);
 
-        float t = vNoise * 0.5 + 0.5;
-        t += vPosition.y * 0.12 + uTime * 0.04;
+        // Animated colour coordinate
+        float t = vNoise * 0.6 + 0.5;
+        t += vPosition.y * 0.15 + vPosition.x * 0.08 + uTime * 0.05;
 
         vec3 col = palette(t);
 
-        // Boost acid green highlights
-        float greenBoost = smoothstep(0.55, 0.85, t);
-        col = mix(col, vec3(0.83, 1.0, 0.38), greenBoost * 0.6);
+        // Acid-green hot-spot in bright areas
+        float greenZone = smoothstep(0.48, 0.78, t);
+        col = mix(col, vec3(0.78, 1.00, 0.30), greenZone * 0.55);
 
-        // Fresnel edge glow
-        col = mix(col, vec3(0.6, 1.0, 0.4), fresnel * 0.5);
+        // Gold / amber highlight band
+        float goldZone = smoothstep(0.72, 0.90, sin(t * 6.28 + uTime * 0.1) * 0.5 + 0.5);
+        col = mix(col, vec3(1.00, 0.78, 0.15), goldZone * 0.30);
 
-        // Darken interior, brighten edges
-        float brightness = 0.6 + fresnel * 0.5 + vNoise * 0.3;
+        // Deep violet in dark areas
+        float darkZone = 1.0 - smoothstep(0.0, 0.45, t);
+        col = mix(col, vec3(0.28, 0.05, 0.60), darkZone * 0.45);
+
+        // Bright teal fresnel rim glow
+        col = mix(col, vec3(0.10, 0.95, 0.75), fresnel * 0.55);
+
+        // Exposure
+        float brightness = 0.55 + fresnel * 0.55 + max(vNoise, 0.0) * 0.35;
         col *= brightness;
+
+        // Slight gamma lift so blacks aren't too muddy
+        col = pow(max(col, vec3(0.0)), vec3(0.88));
 
         gl_FragColor = vec4(col, 1.0);
       }
@@ -155,49 +348,71 @@ window.addEventListener('load', () => {
   point2.position.set(4, -2, 3);
   scene.add(point2);
 
-  // ── Mouse tracking (NDC → world position) ──
-  // Target position the blob moves toward
-  const targetPos = new THREE.Vector3(2.8, 0.3, 0);
-  // Current smoothed position
-  const currentPos = new THREE.Vector3(2.8, 0.3, 0);
+  // ── Home position ──
+  const HOME = new THREE.Vector3(2.8, 0.3, 0);
+  const currentPos = new THREE.Vector3().copy(HOME);
+  const targetPos  = new THREE.Vector3().copy(HOME);
 
-  // Raw mouse in screen pixels
-  let rawMouseX = window.innerWidth / 2;
-  let rawMouseY = window.innerHeight / 2;
-  let isDragging = false;
+  // Mouse world position
+  let mouseWorld = new THREE.Vector3().copy(HOME);
+  let isNearBlob  = false;
 
-  // Convert screen coords to world XY at z=0
+  // Convert screen coords → world XY (at z=0 plane)
   function screenToWorld(screenX, screenY) {
-    // NDC
-    const ndcX = (screenX / window.innerWidth) * 2 - 1;
-    const ndcY = -(screenY / window.innerHeight) * 2 + 1;
-    // Unproject onto z=0 plane
-    const vec = new THREE.Vector3(ndcX, ndcY, 0.5);
+    const ndcX = (screenX / window.innerWidth)  *  2 - 1;
+    const ndcY = (screenY / window.innerHeight) * -2 + 1;
+    const vec  = new THREE.Vector3(ndcX, ndcY, 0.5);
     vec.unproject(camera);
-    const dir = vec.sub(camera.position).normalize();
+    const dir  = vec.sub(camera.position).normalize();
     const dist = -camera.position.z / dir.z;
-    const worldPos = camera.position.clone().addScaledVector(dir, dist);
-    return worldPos;
+    return camera.position.clone().addScaledVector(dir, dist);
   }
 
-  // Mouse / touch move → update target
-  function onPointerMove(screenX, screenY) {
-    const world = screenToWorld(screenX, screenY);
-    // Clamp so blob doesn't go off-screen too much
-    targetPos.x = THREE.MathUtils.clamp(world.x, -5, 5);
-    targetPos.y = THREE.MathUtils.clamp(world.y, -3.5, 3.5);
-    rawMouseX = screenX;
-    rawMouseY = screenY;
-  }
+  // Blob radius in world units (approx)
+  const BLOB_RADIUS = 2.2;
+  const ATTRACT_RADIUS = BLOB_RADIUS * 1.1; // slightly larger hover zone
 
-  document.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
+  document.addEventListener('mousemove', e => {
+    const world = screenToWorld(e.clientX, e.clientY);
+    mouseWorld.copy(world);
+
+    // Distance from mouse to current blob position (XY only)
+    const dx   = world.x - currentPos.x;
+    const dy   = world.y - currentPos.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < ATTRACT_RADIUS) {
+      // Mouse is inside blob → follow mouse
+      isNearBlob  = true;
+      targetPos.x = THREE.MathUtils.clamp(world.x, -5, 5);
+      targetPos.y = THREE.MathUtils.clamp(world.y, -3.5, 3.5);
+    } else {
+      // Mouse left blob → drift back home
+      isNearBlob = false;
+      targetPos.copy(HOME);
+    }
+  });
 
   // Touch support
-  document.addEventListener('touchstart', e => { isDragging = true; }, { passive: true });
   document.addEventListener('touchmove', e => {
-    if (e.touches.length > 0) onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    if (e.touches.length > 0) {
+      const t = e.touches[0];
+      const world = screenToWorld(t.clientX, t.clientY);
+      mouseWorld.copy(world);
+      const dx = world.x - currentPos.x, dy = world.y - currentPos.y;
+      if (Math.sqrt(dx*dx + dy*dy) < ATTRACT_RADIUS) {
+        isNearBlob = true;
+        targetPos.set(
+          THREE.MathUtils.clamp(world.x, -5, 5),
+          THREE.MathUtils.clamp(world.y, -3.5, 3.5),
+          0
+        );
+      } else {
+        isNearBlob = false;
+        targetPos.copy(HOME);
+      }
+    }
   }, { passive: true });
-  document.addEventListener('touchend', () => { isDragging = false; });
 
   // ── Resize ──
   window.addEventListener('resize', () => {
@@ -209,9 +424,14 @@ window.addEventListener('load', () => {
 
   // ── Animate ──
   const clock = new THREE.Clock();
-  // Mouse delta for rotation feedback
-  let prevMouseX = rawMouseX, prevMouseY = rawMouseY;
-  let rotVelX = 0, rotVelY = 0;
+
+  // Accumulated self-rotation angles (so rotation persists across frames)
+  let autoRotY = 0;
+  let autoRotX = 0;
+
+  // Velocity for inertia while dragging
+  let velX = 0, velY = 0;
+  let prevTargetX = HOME.x, prevTargetY = HOME.y;
 
   function animate() {
     requestAnimationFrame(animate);
@@ -219,37 +439,41 @@ window.addEventListener('load', () => {
 
     material.uniforms.uTime.value = t;
 
-    // ── Smooth follow: lerp current → target ──
-    const lerpSpeed = 0.06; // 0 = instant, 1 = no movement
+    // ── Position: heavier feel = higher lerp (more responsive), slow drift home ──
+    const lerpSpeed = isNearBlob ? 0.18 : 0.025;
     currentPos.lerp(targetPos, lerpSpeed);
     mesh.position.copy(currentPos);
 
-    // ── Rotation: spin based on mouse velocity ──
-    const dMouseX = (rawMouseX - prevMouseX) * 0.01;
-    const dMouseY = (rawMouseY - prevMouseY) * 0.01;
-    prevMouseX = rawMouseX;
-    prevMouseY = rawMouseY;
+    // ── Rotation: always slowly self-spinning ──
+    // Slow continuous self-rotation
+    autoRotY += 0.003;          // slow Y spin ~10°/s
+    autoRotX += 0.0008;         // very slow tilt
 
-    // Accumulate rotational velocity, then dampen
-    rotVelY += dMouseX * 0.4;
-    rotVelX += dMouseY * 0.4;
-    rotVelY *= 0.88; // damping
-    rotVelX *= 0.88;
+    // When near blob: mouse movement adds extra spin impulse
+    if (isNearBlob) {
+      const dTX = targetPos.x - prevTargetX;
+      const dTY = targetPos.y - prevTargetY;
+      velY += dTX * 0.06;       // horizontal mouse → Y spin
+      velX -= dTY * 0.04;       // vertical mouse → X tilt
+    }
+    prevTargetX = targetPos.x;
+    prevTargetY = targetPos.y;
 
-    mesh.rotation.y += rotVelY + t * 0.04;
-    mesh.rotation.x += rotVelX;
-    mesh.rotation.z = Math.sin(t * 0.03) * 0.08;
+    // Dampen velocity
+    velY *= 0.92;
+    velX *= 0.92;
 
-    // ── Breathing ──
-    const scale = 1 + Math.sin(t * 0.55) * 0.018;
+    autoRotY += velY;
+    autoRotX += velX;
+
+    // Gentle wobble on Z
+    mesh.rotation.y = autoRotY;
+    mesh.rotation.x = autoRotX + Math.sin(t * 0.07) * 0.08;
+    mesh.rotation.z = Math.sin(t * 0.05) * 0.06;
+
+    // Breathing
+    const scale = 1 + Math.sin(t * 0.5) * 0.015;
     mesh.scale.setScalar(scale);
-
-    // ── Light follows blob ──
-    point1.position.set(
-      currentPos.x - 3,
-      currentPos.y + 3,
-      4
-    );
 
     renderer.render(scene, camera);
   }
