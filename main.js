@@ -155,12 +155,49 @@ window.addEventListener('load', () => {
   point2.position.set(4, -2, 3);
   scene.add(point2);
 
-  // ── Mouse parallax ──
-  let mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', e => {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-  });
+  // ── Mouse tracking (NDC → world position) ──
+  // Target position the blob moves toward
+  const targetPos = new THREE.Vector3(2.8, 0.3, 0);
+  // Current smoothed position
+  const currentPos = new THREE.Vector3(2.8, 0.3, 0);
+
+  // Raw mouse in screen pixels
+  let rawMouseX = window.innerWidth / 2;
+  let rawMouseY = window.innerHeight / 2;
+  let isDragging = false;
+
+  // Convert screen coords to world XY at z=0
+  function screenToWorld(screenX, screenY) {
+    // NDC
+    const ndcX = (screenX / window.innerWidth) * 2 - 1;
+    const ndcY = -(screenY / window.innerHeight) * 2 + 1;
+    // Unproject onto z=0 plane
+    const vec = new THREE.Vector3(ndcX, ndcY, 0.5);
+    vec.unproject(camera);
+    const dir = vec.sub(camera.position).normalize();
+    const dist = -camera.position.z / dir.z;
+    const worldPos = camera.position.clone().addScaledVector(dir, dist);
+    return worldPos;
+  }
+
+  // Mouse / touch move → update target
+  function onPointerMove(screenX, screenY) {
+    const world = screenToWorld(screenX, screenY);
+    // Clamp so blob doesn't go off-screen too much
+    targetPos.x = THREE.MathUtils.clamp(world.x, -5, 5);
+    targetPos.y = THREE.MathUtils.clamp(world.y, -3.5, 3.5);
+    rawMouseX = screenX;
+    rawMouseY = screenY;
+  }
+
+  document.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
+
+  // Touch support
+  document.addEventListener('touchstart', e => { isDragging = true; }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (e.touches.length > 0) onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  document.addEventListener('touchend', () => { isDragging = false; });
 
   // ── Resize ──
   window.addEventListener('resize', () => {
@@ -171,7 +208,10 @@ window.addEventListener('load', () => {
   });
 
   // ── Animate ──
-  let clock = new THREE.Clock();
+  const clock = new THREE.Clock();
+  // Mouse delta for rotation feedback
+  let prevMouseX = rawMouseX, prevMouseY = rawMouseY;
+  let rotVelX = 0, rotVelY = 0;
 
   function animate() {
     requestAnimationFrame(animate);
@@ -179,14 +219,37 @@ window.addEventListener('load', () => {
 
     material.uniforms.uTime.value = t;
 
-    // Slow rotation + mouse parallax
-    mesh.rotation.y = t * 0.08 + mouseX * 0.15;
-    mesh.rotation.x = Math.sin(t * 0.06) * 0.2 + mouseY * 0.1;
-    mesh.rotation.z = Math.sin(t * 0.04) * 0.1;
+    // ── Smooth follow: lerp current → target ──
+    const lerpSpeed = 0.06; // 0 = instant, 1 = no movement
+    currentPos.lerp(targetPos, lerpSpeed);
+    mesh.position.copy(currentPos);
 
-    // Subtle breathing
-    const scale = 1 + Math.sin(t * 0.5) * 0.015;
+    // ── Rotation: spin based on mouse velocity ──
+    const dMouseX = (rawMouseX - prevMouseX) * 0.01;
+    const dMouseY = (rawMouseY - prevMouseY) * 0.01;
+    prevMouseX = rawMouseX;
+    prevMouseY = rawMouseY;
+
+    // Accumulate rotational velocity, then dampen
+    rotVelY += dMouseX * 0.4;
+    rotVelX += dMouseY * 0.4;
+    rotVelY *= 0.88; // damping
+    rotVelX *= 0.88;
+
+    mesh.rotation.y += rotVelY + t * 0.04;
+    mesh.rotation.x += rotVelX;
+    mesh.rotation.z = Math.sin(t * 0.03) * 0.08;
+
+    // ── Breathing ──
+    const scale = 1 + Math.sin(t * 0.55) * 0.018;
     mesh.scale.setScalar(scale);
+
+    // ── Light follows blob ──
+    point1.position.set(
+      currentPos.x - 3,
+      currentPos.y + 3,
+      4
+    );
 
     renderer.render(scene, camera);
   }
