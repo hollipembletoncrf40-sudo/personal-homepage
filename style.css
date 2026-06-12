@@ -1002,6 +1002,145 @@ main { max-width: 1180px; margin: 0 auto; }
   margin-bottom: 0 !important;
 }
 
+/* ══════════════════════════════════════
+   PROJECTS SECTION
+   ══════════════════════════════════════ */
+
+.projects-section {
+  padding: 80px 0 40px;
+  border-top: 1px solid var(--line);
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 36px;
+}
+
+/* Card — the <a> tag itself */
+.project-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 18px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  position: relative;
+  overflow: hidden;
+  transition: transform .30s var(--ease-snap),
+              border-color .30s ease,
+              box-shadow .30s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(212,255,98,.25);
+  box-shadow: 0 24px 60px rgba(0,0,0,.55),
+              0 0 0 1px rgba(212,255,98,.10),
+              inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+/* Animated top accent bar */
+.project-accent-bar {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg,
+    #d4ff62, #00f5c8, #38bdf8, #a855f7, #ff6b6b, #d4ff62);
+  background-size: 300% 100%;
+  animation: bar-flow 4s linear infinite;
+}
+
+@keyframes bar-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+.project-card-inner {
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-index {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(246,244,232,.30);
+  letter-spacing: .08em;
+}
+
+.project-status {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: #d4ff62;
+  background: rgba(212,255,98,.10);
+  border: 1px solid rgba(212,255,98,.22);
+  border-radius: 20px;
+  padding: 3px 9px;
+}
+
+.project-name {
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  background: linear-gradient(120deg, #f6f4e8 0%, #d4ff62 60%, #00f5c8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: background .3s;
+  margin: 0;
+}
+
+.project-card:hover .project-name {
+  background: linear-gradient(120deg, #d4ff62 0%, #00f5c8 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.project-desc {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(246,244,232,.50);
+  letter-spacing: .008em;
+  margin: 0;
+}
+
+.project-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.project-tags {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  color: rgba(56,189,248,.60);
+}
+
+.project-arrow {
+  font-size: 20px;
+  color: rgba(246,244,232,.25);
+  line-height: 1;
+  transition: transform .25s var(--ease-snap), color .25s;
+}
+
+.project-card:hover .project-arrow {
+  transform: translate(3px, -3px);
+  color: #d4ff62;
+}
+
 /* ── Beliefs ── */
 .beliefs {
   padding: 80px 0 100px;
