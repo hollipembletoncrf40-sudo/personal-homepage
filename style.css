@@ -344,12 +344,14 @@ main { max-width: 1180px; margin: 0 auto; }
 .hero h1 {
   font-size: clamp(44px, 8.5vw, 120px);
   font-weight: 900;
-  line-height: 1.0;           /* Playfair italic needs more room than .92 */
+  line-height: 1.3;             /* Playfair italic has tall J swash + deep p descender */
   letter-spacing: -.01em;
   max-width: 100%;
-  overflow: visible;          /* prevent clipping of animated chars */
+  overflow: visible;
   filter: drop-shadow(0 0 32px rgba(0,245,200,.18));
-  padding-bottom: 0.1em;      /* room for Playfair descenders (p, J swash) */
+  /* Extra vertical room so ink overflow never hits parent edge */
+  padding-top: 0.25em;
+  padding-bottom: 0.2em;
 }
 
 /* Playfair Display italic on the name — luxury editorial feel */
@@ -367,9 +369,9 @@ main { max-width: 1180px; margin: 0 auto; }
 .hero h1 .name-gradient {
   display: inline-block;
   max-width: 100%;
-  padding-right: 0.12em;
-  /* Gradient is now applied per .char span below */
-  /* Keep liquid-flow on wrapper as fallback for non-JS */
+  /* Generous padding so the J's swash (top) and p descender (bottom) never clip */
+  padding: 0.15em 0.15em 0.2em 0;
+  /* Gradient fallback on the wrapper */
   background: linear-gradient(
     -45deg,
     #d4ff62, #00f5c8, #38bdf8, #a855f7,
