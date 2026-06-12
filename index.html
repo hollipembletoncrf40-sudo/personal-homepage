@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="JDK22 — AI · Java · Python 工程师" />
+    <title>Herb</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <!-- Three.js Canvas -->
+    <canvas id="threeCanvas"></canvas>
+
+    <div class="shell">
+      <!-- Header -->
+      <header class="site-header">
+        <a href="/" class="brand">herb</a>
+        <div class="header-clock">
+          <span class="clock-label">GMT+8</span>
+          <span class="clock-time" id="clock">--:--:--</span>
+        </div>
+        <nav class="nav">
+          <a href="#stack">Stack</a>
+          <a href="#projects">Projects</a>
+          <a href="#beliefs">Beliefs</a>
+        </nav>
+      </header>
+
+      <main>
+        <!-- Hero Section -->
+        <section class="hero">
+          <div class="hero-meta reveal">
+            <span class="tag">AI</span>
+            <span class="tag-sep">×</span>
+            <span class="tag">Java</span>
+            <span class="tag-sep">×</span>
+            <span class="tag">Python</span>
+          </div>
+
+          <h1 class="reveal" style="--reveal-delay: 80ms">
+            I build things<br/>that think,<br/>scale, and persist.
+          </h1>
+
+          <div class="hero-bottom reveal" style="--reveal-delay: 200ms">
+            <p class="hero-copy">
+              Engineer focused on AI systems, Java backend services, and
+              Python automation — compressing complex systems into clear
+              interfaces and making language models genuinely useful.
+            </p>
+            <div class="hero-actions">
+              <a href="mailto:me@jdk22.com" class="primary-action">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                me@jdk22.com
+              </a>
+              <a href="#stack" class="secondary-action">
+                Explore stack
+              </a>
+            </div>
+          </div>
+
+          <div class="scroll-hint">
+            <span class="scroll-line"></span>
+            <span>SCROLL</span>
+          </div>
+        </section>
+
+        <!-- Marquee / Stack -->
+        <div class="marquee-wrap" id="stack">
+          <div class="marquee-track">
+            <div class="marquee-content">
+              <span class="marquee-item">Java<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Python<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Spring Boot<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">LangChain<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">PostgreSQL<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Docker<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Kubernetes<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">OpenAI API<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Redis<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Kafka<span class="marquee-dot">◆</span></span>
+            </div>
+            <div class="marquee-content" aria-hidden="true">
+              <span class="marquee-item">Java<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Python<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Spring Boot<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">LangChain<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">PostgreSQL<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Docker<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Kubernetes<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">OpenAI API<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Redis<span class="marquee-dot">◆</span></span>
+              <span class="marquee-item">Kafka<span class="marquee-dot">◆</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manifesto -->
+        <section class="manifesto reveal">
+          <p class="manifesto-label">// WHAT I DO</p>
+          <p class="manifesto-text">
+            Compress <em>complexity</em> into<br/><em>clarity</em>.
+          </p>
+          <p class="manifesto-sub">
+            I work at the intersection of AI and backend engineering —
+            building systems that are reliable, observable, and genuinely useful.
+            No magic, just good engineering.
+          </p>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects">
+          <div class="note-grid">
+            <article class="note reveal" style="--reveal-delay: 0ms">
+              <div class="note-index">01</div>
+              <h2>LLM Gateway</h2>
+              <p>A unified API gateway for multiple LLM providers with rate limiting, cost tracking, and fallback routing.</p>
+              <p class="note-tags">AI · JAVA · SPRING BOOT</p>
+            </article>
+            <article class="note reveal" style="--reveal-delay: 80ms">
+              <div class="note-index">02</div>
+              <h2>DocMind</h2>
+              <p>Document intelligence platform — upload any PDF, get structured extraction and Q&A powered by RAG.</p>
+              <p class="note-tags">PYTHON · LANGCHAIN · VECTOR DB</p>
+            </article>
+            <article class="note reveal" style="--reveal-delay: 160ms">
+              <div class="note-index">03</div>
+              <h2>StreamPipe</h2>
+              <p>Real-time data pipeline framework built on Kafka with Python DSL for defining transformation chains.</p>
+              <p class="note-tags">PYTHON · KAFKA · OPEN SOURCE</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Beliefs -->
+        <section class="beliefs reveal" id="beliefs">
+          <p class="manifesto-label">// ENGINEERING BELIEFS</p>
+          <ul class="belief-list">
+            <li class="belief-item">
+              <span class="belief-num">01</span>
+              <span class="belief-text">Complexity is a cost, not a feature</span>
+            </li>
+            <li class="belief-item">
+              <span class="belief-num">02</span>
+              <span class="belief-text">Observability is not optional</span>
+            </li>
+            <li class="belief-item">
+              <span class="belief-num">03</span>
+              <span class="belief-text">AI that can't be debugged can't be trusted</span>
+            </li>
+            <li class="belief-item">
+              <span class="belief-num">04</span>
+              <span class="belief-text">Open source is how we eat</span>
+            </li>
+            <li class="belief-item">
+              <span class="belief-num">05</span>
+              <span class="belief-text">Ship it, then make it beautiful</span>
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="footer-center">
+          <a href="https://github.com/jdk22" class="footer-link" target="_blank">GitHub</a>
+          <a href="https://twitter.com/jdk22" class="footer-link" target="_blank">Twitter</a>
+          <a href="mailto:me@jdk22.com" class="footer-link">Email</a>
+        </div>
+        <div class="footer-right">
+          <span>© 2026 herb</span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Three.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
