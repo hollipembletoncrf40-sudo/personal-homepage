@@ -315,16 +315,21 @@ main { max-width: 1180px; margin: 0 auto; }
 .tag-sep { color: rgba(246,244,232,.28); font-size: 13px; }
 
 .hero h1 {
-  font-size: clamp(48px, 9.5vw, 140px);
+  /* Use vw-based size so it always fits in viewport */
+  font-size: clamp(44px, 8.5vw, 120px);
   font-weight: 900;
   line-height: .92;
   letter-spacing: -.03em;
-  max-width: 680px;
+  max-width: 100%;
+  overflow: visible;
 }
 
 /* “Josephine” — liquid flowing gradient */
 .hero h1 .name-gradient {
   display: block;
+  /* Fit to container, never clip */
+  width: fit-content;
+  max-width: 100%;
   /* 6-stop multicolor mimicking the 3D blob palette */
   background: linear-gradient(
     -45deg,
