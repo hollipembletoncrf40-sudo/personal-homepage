@@ -7,8 +7,8 @@
     <title>Josephine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=3" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Playfair+Display:ital,wght@1,700;1,800;1,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css?v=5" />
   </head>
   <body>
 
@@ -72,8 +72,35 @@
 
           <h1 class="reveal" style="--reveal-delay:80ms">
             <span class="hero-hi" data-en="Hi, I'm" data-zh="你好，我是">Hi, I'm</span><br/>
-            <span class="name-gradient">Josephine.</span>
+            <span class="name-gradient" id="nameGradient">Josephine.</span>
           </h1>
+
+          <!-- Dog mascot -->
+          <div class="dog" id="dogMascot" title="Click me!">
+            <div class="dog-bubble" id="dogBubble">
+              <span class="dog-en">Woof! Nice to meet you 🐾</span>
+              <span class="dog-zh" style="display:none">汪！认识你真高兴 🐾</span>
+            </div>
+            <div class="dog-wrap">
+              <div class="dog-ear dog-ear-l"><div class="dog-ear-in"></div></div>
+              <div class="dog-ear dog-ear-r"><div class="dog-ear-in"></div></div>
+              <div class="dog-head">
+                <div class="dog-eye dog-eye-l"><div class="dog-shine"></div></div>
+                <div class="dog-eye dog-eye-r"><div class="dog-shine"></div></div>
+                <div class="dog-snout">
+                  <div class="dog-nose"></div>
+                  <div class="dog-cheek dog-cheek-l"></div>
+                  <div class="dog-cheek dog-cheek-r"></div>
+                </div>
+              </div>
+              <div class="dog-body">
+                <div class="dog-arm dog-arm-l"></div>
+                <div class="dog-torso"></div>
+                <div class="dog-arm dog-arm-r"></div>
+              </div>
+              <div class="dog-tail"></div>
+            </div>
+          </div>
 
           <div class="hero-bottom reveal" style="--reveal-delay:200ms">
             <p class="hero-copy"

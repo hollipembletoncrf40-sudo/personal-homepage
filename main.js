@@ -552,3 +552,91 @@ document.addEventListener('keydown', e => {
 
   animate();
 })();
+
+// ══════════════════════════════════════
+// APPLE-STYLE CHAR REVEAL
+// ══════════════════════════════════════
+(function () {
+  // ── "Hi, I'm" ── split into chars, animates first
+  const hiEl = document.querySelector('.hero-hi');
+  if (hiEl) {
+    const hiText = hiEl.getAttribute('data-en') || hiEl.textContent.trim();
+    hiEl.setAttribute('aria-label', hiText);
+    hiEl.innerHTML = hiText.split('').map((ch, i) =>
+      `<span class="char" style="--i:${i}">${ch === ' ' ? '&nbsp;' : ch}</span>`
+    ).join('');
+  }
+
+  // ── "Josephine." ── split into chars, animates after Hi I'm
+  const nameEl = document.getElementById('nameGradient');
+  if (nameEl) {
+    const text = 'Josephine.';
+    nameEl.setAttribute('aria-label', text);
+    nameEl.innerHTML = text.split('').map((ch, i) =>
+      `<span class="char" style="--i:${i}">${ch}</span>`
+    ).join('');
+  }
+})();
+
+// ══════════════════════════════════════
+// DOG MASCOT
+// ══════════════════════════════════════
+(function () {
+  const dog    = document.getElementById('dogMascot');
+  const bubble = document.getElementById('dogBubble');
+  if (!dog || !bubble) return;
+
+  const barksEn = [
+    'Woof! Nice to meet you 🐾',
+    'Click me again! 🐶',
+    'Building cool things~ ✨',
+    'Compound interest FTW 📈',
+    'Let\'s go! 🚀',
+  ];
+  const barksZh = [
+    '汪！认识你真高兴 🐾',
+    '再点我一下！🐶',
+    '一起做有意思的事 ✨',
+    '复利的力量！📈',
+    '出发！🚀',
+  ];
+
+  let barkIdx = 0;
+
+  dog.addEventListener('click', () => {
+    // Jump animation
+    dog.classList.remove('jump');
+    void dog.offsetWidth;
+    dog.classList.add('jump');
+    dog.addEventListener('animationend', () => dog.classList.remove('jump'), { once: true });
+
+    // Cycle through barks
+    const lang = document.documentElement.lang === 'zh-CN' ? 'zh' : 'en';
+    const barks = lang === 'zh' ? barksZh : barksEn;
+    barkIdx = (barkIdx + 1) % barks.length;
+
+    const enEl = bubble.querySelector('.dog-en');
+    const zhEl = bubble.querySelector('.dog-zh');
+    if (lang === 'zh') {
+      if (zhEl) zhEl.textContent = barks[barkIdx];
+    } else {
+      if (enEl) enEl.textContent = barks[barkIdx];
+    }
+
+    // Bounce the bubble
+    bubble.style.transform = 'scale(1.15)';
+    setTimeout(() => { bubble.style.transform = ''; }, 200);
+  });
+
+  // Sync dog bubble with language toggle
+  const langBtn = document.getElementById('langBtn');
+  if (langBtn) {
+    langBtn.addEventListener('click', () => {
+      const isZh = document.documentElement.lang === 'zh-CN';
+      const enEl = bubble.querySelector('.dog-en');
+      const zhEl = bubble.querySelector('.dog-zh');
+      if (enEl) enEl.style.display = isZh ? '' : 'none';
+      if (zhEl) zhEl.style.display = isZh ? 'none' : '';
+    });
+  }
+})();
