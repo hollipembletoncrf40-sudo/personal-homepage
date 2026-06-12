@@ -202,14 +202,30 @@ a { color: inherit; text-decoration: none; }
 .brand {
   display: inline-flex;
   align-items: center;
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  background: var(--grad-subtle);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(13px, 1.1vw, 17px);   /* scales with viewport */
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  background: linear-gradient(
+    90deg,
+    #d4ff62 0%,
+    #00f5c8 30%,
+    #38bdf8 55%,
+    #a855f7 80%,
+    #d4ff62 100%
+  );
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: brand-shimmer 4s linear infinite;
+}
+
+@keyframes brand-shimmer {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .brand::before {
@@ -1740,7 +1756,7 @@ main { max-width: 1180px; margin: 0 auto; }
     border-radius: 18px;
     gap: 4px;
   }
-  .brand { font-size: 13px; }
+  .brand { font-size: 11px; letter-spacing: 0; }
   .nav a { font-size: 11px; padding: 0 7px; }
   .lang-btn { height: 26px; padding: 0 10px; font-size: 10px; }
 
