@@ -344,11 +344,11 @@ main { max-width: 1180px; margin: 0 auto; }
 .hero h1 {
   font-size: clamp(44px, 8.5vw, 120px);
   font-weight: 900;
-  line-height: 1.0;             /* tight — the <br> gap is controlled here */
+  line-height: 1.0;
   letter-spacing: -.01em;
   max-width: 100%;
   overflow: visible;
-  filter: drop-shadow(0 0 32px rgba(0,245,200,.18));
+  /* drop-shadow removed — GPU-expensive filter on large text */
 }
 
 /* Playfair Display italic on the name — luxury editorial feel */
@@ -362,42 +362,37 @@ main { max-width: 1180px; margin: 0 auto; }
 }
 
 /* “Josephine” — liquid flowing gradient */
-/* Second rule: layout container when chars are present */
+/* Josephine. liquid gradient — optimized background-size */
 .hero h1 .name-gradient {
   display: inline-block;
   max-width: 100%;
-  /*
-   * Negative margin-top pulls Josephine. UP toward Hi I'm:
-   *   −0.05em closes the <br> gap without overlapping
-   * Padding gives Playfair ink space: top for J swash, bottom for p/y descenders
-   */
   margin-top: -0.05em;
   padding: 0.2em 0.15em 0.2em 0;
-  /* Gradient fallback on the wrapper */
   background: linear-gradient(
     -45deg,
     #d4ff62, #00f5c8, #38bdf8, #a855f7,
     #ff6b6b, #ffd93d, #00f5c8, #d4ff62
   );
-  background-size: 400% 400%;
+  background-size: 200% 200%;   /* was 400% — halved = 4x faster repaint */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: liquid-flow 7s ease-in-out infinite;
+  will-change: background-position;
 }
 
-/* Josephine. chars start AFTER Hi I'm is mostly in (~900ms) */
+/* Josephine. chars — GPU layer per char, background-size optimized */
 .hero h1 .name-gradient .char {
   background: inherit;
-  background-size: 400% 400%;
+  background-size: 200% 200%;   /* match parent */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation:
-    char-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    char-reveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards,
     liquid-flow  7s ease-in-out infinite;
-  /* Start at 900ms so "Hi, I'm" lands first */
   animation-delay: calc(var(--i) * 60ms + 900ms), 0s;
+  will-change: transform, opacity;
 }
 
 
@@ -556,22 +551,19 @@ main { max-width: 1180px; margin: 0 auto; }
    APPLE-STYLE CHAR REVEAL ANIMATION
    ══════════════════════════════════════ */
 
-/* Each character: starts blurred + shifted down */
+/* Char reveal: opacity + translateY ONLY — no blur (blur causes per-element rasterization) */
 .char {
   display: inline-block;
   opacity: 0;
   transform: translateY(0.5em);
-  filter: blur(10px);
   animation: char-reveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  /* delay = index × 55ms + base 300ms */
   animation-delay: calc(var(--i) * 55ms + 300ms);
-  will-change: opacity, transform, filter;
+  will-change: transform, opacity;
 }
 
 @keyframes char-reveal {
-  0%   { opacity: 0;   transform: translateY(0.5em);  filter: blur(10px); }
-  55%  { opacity: 1;   filter: blur(0); }
-  100% { opacity: 1;   transform: translateY(0);       filter: blur(0); }
+  0%   { opacity: 0; transform: translateY(0.5em); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* "Hi, I'm" — Playfair Display italic, same artistic family as name */
