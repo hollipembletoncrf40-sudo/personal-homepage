@@ -859,12 +859,12 @@ document.addEventListener('keydown', e => {
       this.size   = isSparkle ? rnd(0.8, 2.2) : rnd(2, 5.5);
       this.color  = pick(PAL);
       this.alpha  = 1;
-      this.fade   = isSparkle ? rnd(0.016, 0.028) : rnd(0.008, 0.016);
-      this.grav   = isSparkle ? 0.06 : 0.12;
-      this.drag   = isSparkle ? 0.97 : 0.985;
+      this.fade   = isSparkle ? rnd(0.035, 0.055) : rnd(0.022, 0.038);
+      this.grav   = isSparkle ? 0.10 : 0.18;
+      this.drag   = isSparkle ? 0.96 : 0.975;
       this.glow   = isSparkle ? rnd(4, 10)  : rnd(10, 24);
       this.trail  = [];
-      this.tLen   = isSparkle ? Math.floor(rnd(3, 7)) : Math.floor(rnd(5, 12));
+      this.tLen   = isSparkle ? Math.floor(rnd(2, 4)) : Math.floor(rnd(3, 7));
       // slow rotation for star twinkle
       this.angle  = rnd(0, Math.PI * 2);
       this.spin   = rnd(-0.15, 0.15);
