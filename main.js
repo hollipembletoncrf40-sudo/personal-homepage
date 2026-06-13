@@ -818,3 +818,156 @@ document.addEventListener('keydown', e => {
     });
   }
 })();
+
+// ══════════════════════════════════════
+// GALAXY CLICK PARTICLES — 仙女散花
+// ══════════════════════════════════════
+(function () {
+  // Full-screen overlay canvas — pointer-events:none so clicks pass through
+  const cvs = document.createElement('canvas');
+  cvs.style.cssText = [
+    'position:fixed', 'inset:0', 'width:100%', 'height:100%',
+    'pointer-events:none', 'z-index:99999'
+  ].join(';');
+  document.body.appendChild(cvs);
+  const ctx = cvs.getContext('2d');
+
+  function resize() { cvs.width = innerWidth; cvs.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ── Palette: matches the site's fiber / tag rainbow ──
+  const PAL = [
+    '#d4ff62','#00f5c8','#38bdf8','#a855f7',
+    '#ff6b6b','#ffd93d','#ff9f43','#c084fc',
+    '#67e8f9','#86efac','#fbbf24','#f472b6',
+  ];
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  // ── Particle ──
+  class Star {
+    constructor(x, y, isSparkle) {
+      this.x = this.ox = x;
+      this.y = this.oy = y;
+      const angle = rnd(0, Math.PI * 2);
+      const spd   = isSparkle ? rnd(5, 16) : rnd(2, 9);
+      this.vx     = Math.cos(angle) * spd;
+      // 仙女散花: upward bias on velocity
+      this.vy     = Math.sin(angle) * spd - rnd(2, isSparkle ? 8 : 5);
+      this.size   = isSparkle ? rnd(0.8, 2.2) : rnd(2, 5.5);
+      this.color  = pick(PAL);
+      this.alpha  = 1;
+      this.fade   = isSparkle ? rnd(0.016, 0.028) : rnd(0.008, 0.016);
+      this.grav   = isSparkle ? 0.06 : 0.12;
+      this.drag   = isSparkle ? 0.97 : 0.985;
+      this.glow   = isSparkle ? rnd(4, 10)  : rnd(10, 24);
+      this.trail  = [];
+      this.tLen   = isSparkle ? Math.floor(rnd(3, 7)) : Math.floor(rnd(5, 12));
+      // slow rotation for star twinkle
+      this.angle  = rnd(0, Math.PI * 2);
+      this.spin   = rnd(-0.15, 0.15);
+    }
+
+    update() {
+      this.trail.push({ x: this.x, y: this.y });
+      if (this.trail.length > this.tLen) this.trail.shift();
+      this.vx *= this.drag;
+      this.vy *= this.drag;
+      this.vy += this.grav;
+      this.x  += this.vx;
+      this.y  += this.vy;
+      this.alpha -= this.fade;
+      this.angle += this.spin;
+    }
+
+    draw() {
+      // Trail
+      for (let i = 0; i < this.trail.length; i++) {
+        const t  = this.trail[i];
+        const ta = (i / this.trail.length) * this.alpha * 0.35;
+        const ts = this.size * (i / this.trail.length) * 0.65;
+        ctx.save();
+        ctx.globalAlpha = ta;
+        ctx.shadowBlur  = this.glow * 0.6;
+        ctx.shadowColor = this.color;
+        ctx.fillStyle   = this.color;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, ts, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      // Glowing orb
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.shadowBlur  = this.glow;
+      ctx.shadowColor = this.color;
+      ctx.fillStyle   = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      // Bright white inner core
+      ctx.shadowBlur  = this.glow * 0.4;
+      ctx.fillStyle   = `rgba(255,255,255,${this.alpha * 0.75})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    dead() { return this.alpha <= 0; }
+  }
+
+  // ── Shockwave ring flash at click point ──
+  class Ring {
+    constructor(x, y) {
+      this.x = x; this.y = y;
+      this.r = 4; this.alpha = 0.8;
+      this.color = pick(PAL);
+    }
+    update() { this.r += 6; this.alpha -= 0.055; }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha  = Math.max(0, this.alpha);
+      ctx.strokeStyle  = this.color;
+      ctx.shadowBlur   = 18;
+      ctx.shadowColor  = this.color;
+      ctx.lineWidth    = 2.5;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    dead() { return this.alpha <= 0; }
+  }
+
+  const pool = [];
+
+  function burst(x, y) {
+    // 3 concentric rings
+    for (let i = 0; i < 3; i++) setTimeout(() => pool.push(new Ring(x, y)), i * 80);
+    // 80 glowing stars
+    for (let i = 0; i < 80; i++) pool.push(new Star(x, y, false));
+    // 55 fast sparkles
+    for (let i = 0; i < 55; i++) pool.push(new Star(x, y, true));
+  }
+
+  let rafId = null;
+  function loop() {
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    for (let i = pool.length - 1; i >= 0; i--) {
+      pool[i].update();
+      pool[i].draw();
+      if (pool[i].dead()) pool.splice(i, 1);
+    }
+    rafId = pool.length > 0 ? requestAnimationFrame(loop) : null;
+  }
+
+  document.addEventListener('click', e => {
+    // Don't fire inside modals / buttons that have their own interactions
+    if (e.target.closest('.qr-overlay, .qr-modal')) return;
+    burst(e.clientX, e.clientY);
+    if (!rafId) loop();
+  });
+})();
