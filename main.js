@@ -422,27 +422,32 @@ document.addEventListener('keydown', e => {
   const originalPos = new Float32Array(positionAttr.array.length);
   originalPos.set(positionAttr.array);
 
-  // ── Shader Material — Fiber Bundle (WebGL-safe) ──
+  // ── Shader Material — Fiber Bundle with Roughness Morph ──
   const material = new THREE.ShaderMaterial({
     uniforms: {
-      uTime: { value: 0 },
+      uTime:      { value: 0 },
+      uRoughness: { value: 0.5 }, // 0=silky smooth, 1=coarse fibrous
     },
     vertexShader: `
       varying vec3 vNormal;
       varying vec3 vPosition;
       uniform float uTime;
+      uniform float uRoughness;
 
       void main() {
         vNormal   = normalize(normalMatrix * normal);
         vPosition = position;
 
-        // 4-octave organic displacement
+        // Displacement amplitude scales with roughness (rough = spikier)
+        float amp = mix(0.18, 0.35, uRoughness);
+
         float d  = sin(position.x * 2.1 + uTime * 0.55)
                  * cos(position.y * 1.8 - uTime * 0.38)
-                 * sin(position.z * 2.4 + uTime * 0.47) * 0.26;
-        d += sin(position.x * 4.2 + position.y * 3.1 + uTime * 0.90) * 0.10;
-        d += cos(position.y * 5.0 + position.z * 3.8 - uTime * 0.62) * 0.07;
-        d += sin(position.z * 3.3 - position.x * 2.7 + uTime * 1.10) * 0.05;
+                 * sin(position.z * 2.4 + uTime * 0.47) * amp;
+        d += sin(position.x * 4.2 + position.y * 3.1 + uTime * 0.90) * (amp * 0.38);
+        d += cos(position.y * 5.0 + position.z * 3.8 - uTime * 0.62) * (amp * 0.27);
+        // Extra high-freq detail when rough
+        d += sin(position.z * 8.5 - position.x * 6.2 + uTime * 1.8) * (uRoughness * 0.12);
 
         vec3 newPos = position + normal * d;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
@@ -452,8 +457,8 @@ document.addEventListener('keydown', e => {
       varying vec3 vNormal;
       varying vec3 vPosition;
       uniform float uTime;
+      uniform float uRoughness;  // 0=smooth, 1=coarse
 
-      // ── Dual cosine palette (8 perceptual colours) ──
       vec3 pal(float t) {
         vec3 a1 = vec3(0.15, 0.40, 0.60);
         vec3 b1 = vec3(0.60, 0.45, 0.40);
@@ -470,67 +475,73 @@ document.addEventListener('keydown', e => {
         return mix(A, B, 0.5 + 0.5 * sin(t * 3.14159 + uTime * 0.09));
       }
 
-      // ── Fiber strand via dot-product band (WebGL-safe, no atan needed) ──
-      // Projects position onto an axis, creates repeating thin lines with fract
-      float fiber(vec3 p, vec3 axis, float freq, float speed) {
+      // Roughness-aware fiber:
+      // smooth (rough=0) → thick blurry bands (silky sheen)
+      // rough  (rough=1) → thin sharp lines (coarse fibrous)
+      float fiber(vec3 p, vec3 axis, float baseFreq, float speed) {
+        float freq      = baseFreq * mix(0.45, 1.8, uRoughness);
+        float thickness = mix(0.16,  0.025, uRoughness); // wide→thin
         float proj = dot(normalize(p), normalize(axis));
         float band = fract(proj * freq + uTime * speed);
-        return 1.0 - smoothstep(0.0, 0.06, min(band, 1.0 - band));
+        return 1.0 - smoothstep(0.0, thickness, min(band, 1.0 - band));
       }
 
       void main() {
-        // Fresnel (view-space normal — safe without cameraPosition varying)
         float NdotV = max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
-        float fresnel = pow(1.0 - NdotV, 3.0);
+        float fresnel = pow(1.0 - NdotV, mix(2.0, 4.5, uRoughness));
 
-        // ── Base colour ──
         float tBase = vPosition.y * 0.22 + vPosition.x * 0.10
                     + vPosition.z * 0.08 + uTime * 0.04;
         vec3 base = pal(tBase);
 
-        // ── 4 fiber layers along different axes ──
-        // Each axis gives a different "winding" around the sphere
-        float f1 = fiber(vPosition, vec3(0.0, 1.0, 0.0), 20.0,  0.04);  // Y-axis winds
-        float f2 = fiber(vPosition, vec3(1.0, 0.0, 0.0), 16.0, -0.03);  // X-axis winds
-        float f3 = fiber(vPosition, vec3(0.7, 0.7, 0.0), 26.0,  0.05);  // diagonal
-        float f4 = fiber(vPosition, vec3(0.0, 0.5, 0.8), 14.0, -0.02);  // oblique
+        // 4 fiber layers — frequency & thickness driven by uRoughness
+        float f1 = fiber(vPosition, vec3(0.0, 1.0, 0.0), 20.0,  0.04);
+        float f2 = fiber(vPosition, vec3(1.0, 0.0, 0.0), 16.0, -0.03);
+        float f3 = fiber(vPosition, vec3(0.7, 0.7, 0.0), 26.0,  0.05);
+        float f4 = fiber(vPosition, vec3(0.0, 0.5, 0.8), 14.0, -0.02);
 
-        // Each fiber gets its own color from the palette
-        vec3 fc1 = pal(tBase + 0.00) * 3.2;
-        vec3 fc2 = pal(tBase + 0.25) * 2.8;
-        vec3 fc3 = pal(tBase + 0.50) * 3.5;
-        vec3 fc4 = pal(tBase + 0.75) * 2.5;
+        // Brightness of fibers: smooth=soft glow, rough=harsh bright lines
+        float fiberBright = mix(1.8, 3.8, uRoughness);
+        vec3 fc1 = pal(tBase + 0.00) * fiberBright;
+        vec3 fc2 = pal(tBase + 0.25) * fiberBright;
+        vec3 fc3 = pal(tBase + 0.50) * fiberBright * 1.1;
+        vec3 fc4 = pal(tBase + 0.75) * fiberBright * 0.9;
 
         vec3 fibers = fc1 * f1 + fc2 * f2 + fc3 * f3 + fc4 * f4;
 
-        // ── Caustic shimmer ──
+        // Smooth mode: add a wide specular sheen
+        float sheen = pow(NdotV, mix(1.5, 8.0, uRoughness));
+        vec3 sheenCol = mix(
+          vec3(0.9, 1.0, 1.0) * sheen * 0.6,  // smooth: broad white sheen
+          vec3(0.0),                             // rough: no sheen
+          uRoughness
+        );
+
+        // Caustic shimmer (stronger when rough)
         float shimmer = sin(vPosition.x * 9.0 + uTime * 1.3)
                       * sin(vPosition.y * 7.0 - uTime * 1.0)
                       * sin(vPosition.z * 8.0 + uTime * 1.6);
-        shimmer = max(0.0, shimmer) * 0.45;
+        shimmer = max(0.0, shimmer) * mix(0.2, 0.55, uRoughness);
 
-        // ── Accent hot-spots ──
         float gt = 0.5 + 0.5 * sin(uTime * 0.30 + vPosition.y * 2.0);
         float ct = 0.5 + 0.5 * cos(uTime * 0.25 + vPosition.x * 1.5);
         vec3 hotspot = mix(vec3(1.0, 0.35, 0.55), vec3(0.82, 1.0, 0.28), gt) * 0.30
                      + mix(vec3(0.15, 1.0, 0.88), vec3(0.55, 0.10, 1.0), ct) * 0.22;
 
-        // ── Fresnel rim (cyan→purple) ──
         vec3 rimCol = mix(vec3(0.15, 1.0, 0.88), vec3(0.55, 0.10, 1.0),
                           0.5 + 0.5 * sin(uTime * 0.20));
-        vec3 rim = rimCol * fresnel * 2.5;
+        // Rim is stronger when smooth (glassy edge)
+        vec3 rim = rimCol * fresnel * mix(3.2, 1.8, uRoughness);
 
-        // ── Compose ──
-        vec3 col = base * 0.40
-                 + fibers * 0.72
+        vec3 col = base  * mix(0.55, 0.30, uRoughness)  // base dims when rough (fibers dominate)
+                 + fibers * mix(0.55, 0.88, uRoughness)
+                 + sheenCol
                  + shimmer * vec3(0.15, 1.0, 0.88)
                  + hotspot
                  + rim;
 
-        // Reinhard tone-map
         float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
         col /= (1.0 + lum * 0.45);
-
         col = pow(max(col, vec3(0.0)), vec3(0.85));
 
         gl_FragColor = vec4(col, 1.0);
@@ -639,16 +650,34 @@ document.addEventListener('keydown', e => {
   let velX = 0, velY = 0;
   let prevTargetX = HOME.x, prevTargetY = HOME.y;
 
+  // ── Wander path: dual-frequency Lissajous covering the viewport ──
+  // Camera FOV 45° at z=5 → viewport ~±3.5x, ±2.0y at z=0
+  function wander(t) {
+    const x = Math.sin(t * 0.040) * 2.8 + Math.cos(t * 0.067 + 1.1) * 1.0;
+    const y = Math.sin(t * 0.053 + 0.7) * 1.6 + Math.cos(t * 0.038 + 2.3) * 0.6;
+    return new THREE.Vector3(x, y, 0);
+  }
+
   function animate() {
     requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
 
     material.uniforms.uTime.value = t;
 
-    // ── Position: heavy, sluggish movement ──
-    // Near blob: 0.07 (was 0.18) — feels like dragging through water
-    // Drifting home: 0.008 (was 0.025) — slow, weighted return
-    const lerpSpeed = isNearBlob ? 0.07 : 0.008;
+    // ── Roughness: slow cycle smooth↔coarse (~80s period) ──
+    // Eased with sin² so it lingers at extremes (truly smooth or truly rough)
+    const rawRough = Math.sin(t * 0.078);
+    const roughness = 0.5 + 0.5 * Math.sign(rawRough) * Math.pow(Math.abs(rawRough), 0.6);
+    material.uniforms.uRoughness.value = Math.max(0, Math.min(1, roughness));
+
+    // ── Target: wander autonomously unless mouse is controlling ──
+    if (!isNearBlob) {
+      const wp = wander(t);
+      targetPos.lerp(wp, 0.004);    // wander target shifts very slowly
+    }
+
+    // ── Position lerp: heavy drag ──
+    const lerpSpeed = isNearBlob ? 0.07 : 0.012;
     currentPos.lerp(targetPos, lerpSpeed);
     mesh.position.copy(currentPos);
 
