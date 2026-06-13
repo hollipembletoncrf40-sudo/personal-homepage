@@ -645,40 +645,41 @@ document.addEventListener('keydown', e => {
 
     material.uniforms.uTime.value = t;
 
-    // ── Position: heavier feel = higher lerp (more responsive), slow drift home ──
-    const lerpSpeed = isNearBlob ? 0.18 : 0.025;
+    // ── Position: heavy, sluggish movement ──
+    // Near blob: 0.07 (was 0.18) — feels like dragging through water
+    // Drifting home: 0.008 (was 0.025) — slow, weighted return
+    const lerpSpeed = isNearBlob ? 0.07 : 0.008;
     currentPos.lerp(targetPos, lerpSpeed);
     mesh.position.copy(currentPos);
 
-    // ── Rotation: always slowly self-spinning ──
-    // Slow continuous self-rotation
-    autoRotY += 0.003;          // slow Y spin ~10°/s
-    autoRotX += 0.0008;         // very slow tilt
+    // ── Rotation: slow, heavy self-spin ──
+    autoRotY += 0.0015;           // halved — feels more massive
+    autoRotX += 0.0004;
 
-    // When near blob: mouse movement adds extra spin impulse
+    // Mouse impulse — reduced sensitivity, heavier feel
     if (isNearBlob) {
       const dTX = targetPos.x - prevTargetX;
       const dTY = targetPos.y - prevTargetY;
-      velY += dTX * 0.06;       // horizontal mouse → Y spin
-      velX -= dTY * 0.04;       // vertical mouse → X tilt
+      velY += dTX * 0.025;        // was 0.06 — less spin-up per mouse move
+      velX -= dTY * 0.016;        // was 0.04
     }
     prevTargetX = targetPos.x;
     prevTargetY = targetPos.y;
 
-    // Dampen velocity
-    velY *= 0.92;
-    velX *= 0.92;
+    // Heavy damping — velocity decays very slowly (like dense fluid)
+    velY *= 0.97;                  // was 0.92 — longer spin-down
+    velX *= 0.97;
 
     autoRotY += velY;
     autoRotX += velX;
 
-    // Gentle wobble on Z
+    // Slow, deep Z wobble — like a massive buoy
     mesh.rotation.y = autoRotY;
-    mesh.rotation.x = autoRotX + Math.sin(t * 0.07) * 0.08;
-    mesh.rotation.z = Math.sin(t * 0.05) * 0.06;
+    mesh.rotation.x = autoRotX + Math.sin(t * 0.04) * 0.06;
+    mesh.rotation.z = Math.sin(t * 0.03) * 0.04;
 
-    // Breathing
-    const scale = 1 + Math.sin(t * 0.5) * 0.015;
+    // Slow, deep breathing — heavy object feels alive but weighty
+    const scale = 1 + Math.sin(t * 0.20) * 0.022;
     mesh.scale.setScalar(scale);
 
     renderer.render(scene, camera);
