@@ -366,7 +366,7 @@ const closeBtn = document.getElementById('qrClose');
 function openQR()  { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeQR() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
 
-// All buttons that open the QR
+// All buttons that open the WeChat QR
 ['heroWechatBtn', 'connectWechatBtn', 'footerWechatBtn'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('click', openQR);
@@ -374,14 +374,28 @@ function closeQR() { overlay.classList.remove('open'); document.body.style.overf
 
 closeBtn.addEventListener('click', closeQR);
 
-// Close on backdrop click
 overlay.addEventListener('click', e => {
   if (e.target === overlay) closeQR();
 });
 
-// Close on Escape
+// ── QQ QR Modal ──
+const qqOverlay  = document.getElementById('qqOverlay');
+const qqCloseBtn = document.getElementById('qqClose');
+
+function openQQ()  { qqOverlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeQQ() { qqOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+['footerQqBtn', 'heroQqBtn', 'connectQqBtn'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', openQQ);
+});
+
+if (qqCloseBtn) qqCloseBtn.addEventListener('click', closeQQ);
+if (qqOverlay)  qqOverlay.addEventListener('click', e => { if (e.target === qqOverlay) closeQQ(); });
+
+// Close on Escape (both modals)
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeQR();
+  if (e.key === 'Escape') { closeQR(); closeQQ(); }
 });
 
 // ══════════════════════════════════════

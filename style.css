@@ -1954,7 +1954,8 @@ main { max-width: 1180px; margin: 0 auto; }
 /* Footer WeChat button */
 
 
-.footer-wechat {
+.footer-wechat,
+.footer-qq {
   background: none;
   border: none;
   font-family: var(--mono);
@@ -1962,6 +1963,8 @@ main { max-width: 1180px; margin: 0 auto; }
   cursor: pointer;
   padding: 0;
 }
+
+.footer-qq:hover { color: #12b7f5; }
 
 /* ══════════════════════════════════════
    RESPONSIVE — Mobile First
