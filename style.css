@@ -2154,3 +2154,249 @@ main { max-width: 1180px; margin: 0 auto; }
   .currently-item { background: rgba(7,9,7,.75); }
   .stack-pill { transform: none !important; }
 }
+
+/* ══════════════════════════════════════
+   IN MOTION — 三段视觉化的人生信条
+   ══════════════════════════════════════ */
+.motion-lab {
+  padding: 100px 0 120px;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.motion-sub {
+  max-width: 580px;
+  margin: 16px 0 80px;
+  color: rgba(246,244,232,.55);
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.7;
+}
+
+.motion-demo {
+  position: relative;
+  margin-bottom: 140px;
+  padding-top: 12px;
+}
+.motion-demo:last-child { margin-bottom: 0; }
+
+/* 图注 — 优雅引言式 */
+.motion-caption {
+  max-width: 520px;
+  margin: 40px auto 0;
+  text-align: center;
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.75;
+  color: rgba(246,244,232,.55);
+  letter-spacing: .01em;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════
+   01 · 词环星系 — 三层 3D 词环嵌套
+   ══════════════════════════════════════ */
+.motion-cylinder-block {
+  perspective: 1400px;
+}
+
+.cylinder-stage {
+  position: relative;
+  height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.galaxy {
+  position: relative;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-14deg);
+  will-change: transform;
+}
+
+.ring-tier {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ring-tier.t-outer  { transform: translateY(-30px); }
+.ring-tier.t-middle { transform: translateY(0); }
+.ring-tier.t-inner  { transform: translateY(30px); }
+
+.cyl-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: center center;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-weight: 900;
+  letter-spacing: .04em;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: rgba(7,9,7,.55);
+  border: 1px solid rgba(246,244,232,.14);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  user-select: none;
+}
+
+/* tier 字号区分 */
+.t-outer  .cyl-face { font-size: clamp(20px, 2.6vw, 30px); opacity: .75; }
+.t-middle .cyl-face { font-size: clamp(34px, 5vw, 60px); }
+.t-inner  .cyl-face { font-size: clamp(16px, 1.9vw, 22px); opacity: .55; }
+
+/* face palette — 站点 6 色 */
+.cyl-face.f-0 { color: #d4ff62; border-color: rgba(212,255,98,.4); box-shadow: 0 0 28px rgba(212,255,98,.14); }
+.cyl-face.f-1 { color: #00f5c8; border-color: rgba(0,245,200,.4); box-shadow: 0 0 28px rgba(0,245,200,.14); }
+.cyl-face.f-2 { color: #38bdf8; border-color: rgba(56,189,248,.4); box-shadow: 0 0 28px rgba(56,189,248,.14); }
+.cyl-face.f-3 { color: #a855f7; border-color: rgba(168,85,247,.4); box-shadow: 0 0 28px rgba(168,85,247,.14); }
+.cyl-face.f-4 { color: #ff6b6b; border-color: rgba(255,107,107,.4); box-shadow: 0 0 28px rgba(255,107,107,.14); }
+.cyl-face.f-5 { color: #ffd93d; border-color: rgba(255,217,61,.4); box-shadow: 0 0 28px rgba(255,217,61,.14); }
+
+/* ══════════════════════════════════════
+   02 · 复利脉冲 — 多层流动环 + 中心大字
+   ══════════════════════════════════════ */
+.ring-stage {
+  position: relative;
+  width: min(560px, 92vw);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rainbow-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ring-circle {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transform-origin: 100px 100px;
+}
+.ring-circle.r1 { stroke: #d4ff62; filter: drop-shadow(0 0 10px rgba(212,255,98,.6)); }
+.ring-circle.r2 { stroke: #00f5c8; filter: drop-shadow(0 0 10px rgba(0,245,200,.6)); }
+.ring-circle.r3 { stroke: #38bdf8; filter: drop-shadow(0 0 10px rgba(56,189,248,.6)); }
+.ring-circle.r4 { stroke: #a855f7; filter: drop-shadow(0 0 10px rgba(168,85,247,.6)); }
+.ring-circle.r5 { stroke: #ff6b6b; filter: drop-shadow(0 0 10px rgba(255,107,107,.6)); }
+.ring-circle.r6 { stroke: #ffd93d; filter: drop-shadow(0 0 10px rgba(255,217,61,.6)); }
+
+/* 中心大字 */
+.ring-core {
+  position: relative;
+  z-index: 2;
+  font-family: var(--mono);
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-align: center;
+  background: linear-gradient(135deg, #d4ff62 0%, #00f5c8 40%, #a855f7 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: liquid-flow 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(0,245,200,.25));
+}
+
+/* 脉冲外晕 */
+.ring-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(212,255,98,.18);
+  animation: pulse-ring 3s var(--ease-snap) infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(.78); opacity: .8; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+/* ══════════════════════════════════════
+   03 · 能量场 — 字母矩阵地形，随鼠标起伏
+   ══════════════════════════════════════ */
+.motion-grid-block {
+  perspective: 1200px;
+}
+
+.energy-stage {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  transform-style: preserve-3d;
+}
+
+.stagger-grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 auto;
+  transform: rotateX(52deg) rotateZ(0deg);
+  transform-style: preserve-3d;
+}
+
+.stagger-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 5px;
+  background: rgba(212,255,98,.05);
+  border: 1px solid rgba(246,244,232,.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, background, border-color;
+}
+
+/* 字母 — 默认暗淡，被 lift 点亮 */
+.cell-letter {
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: clamp(11px, 1.4vw, 18px);
+  color: rgba(246,244,232,.18);
+  letter-spacing: 0;
+  user-select: none;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+
+/* JOSEPHINE 字母 — 默认就有微光 */
+.stagger-cell.is-name .cell-letter {
+  font-size: clamp(20px, 3vw, 36px);
+  font-weight: 900;
+  color: rgba(246,244,232,.5);
+  text-shadow: 0 0 12px rgba(212,255,98,.25);
+}
+
+/* 触屏：取消 3D 透视，退化为 2D 字母海 */
+@media (hover: none) {
+  .stagger-grid { transform: none; }
+}
+
+@media (max-width: 820px) {
+  .motion-lab { padding: 70px 0 70px; }
+  .motion-demo { margin-bottom: 100px; }
+  .cylinder-stage { height: 420px; }
+  .stagger-grid { grid-template-columns: repeat(12, 1fr); gap: 3px; }
+  .energy-stage { padding: 40px 12px; }
+  .ring-stage { width: 92vw; }
+  .ring-core { font-size: clamp(24px, 8vw, 40px); }
+}

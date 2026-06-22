@@ -971,3 +971,348 @@ document.addEventListener('keydown', e => {
     if (!rafId) loop();
   });
 })();
+
+
+// ══════════════════════════════════════
+// IN MOTION — 三段视觉化的人生信条
+// ══════════════════════════════════════
+(function () {
+  if (!window.anime) { console.warn('anime.js not loaded — IN MOTION skipped'); return; }
+
+  // ══════════════════════════════════════
+  // 01 · 词环星系 —— 三层 3D 嵌套词环
+  // ══════════════════════════════════════
+  const galaxy = document.getElementById('galaxy');
+  const stage  = document.getElementById('cylinderStage');
+  if (galaxy && stage) {
+    // 三层：外圈大词、中圈身份词、内圈延伸词
+    const TIERS = [
+      { tier: 'outer',  words: ['LEARN', 'BUILD', 'INVEST', 'GROW'],         radius: 320 },
+      { tier: 'middle', words: ['AI', 'WEB3', 'INVESTING', 'INTJ'],          radius: 220 },
+      { tier: 'inner',  words: ['COMPOUND', 'CREATE', 'OBSERVE', 'ADAPT'],   radius: 130 },
+    ];
+
+    const tierEls = {};
+    TIERS.forEach(({ tier, words, radius }) => {
+      const wrap = galaxy.querySelector(`.t-${tier}`);
+      if (!wrap) return;
+      tierEls[tier] = wrap;
+
+      const N = words.length;
+      const step = 360 / N;
+      words.forEach((word, i) => {
+        const face = document.createElement('div');
+        face.className = `cyl-face f-${i % 6}`;
+        face.textContent = word;
+        // 让面在自身平面里居中：translate -50%,-50% 后再 rotateY+translateZ
+        face.style.transform =
+          `translate(-50%, -50%) rotateY(${i * step}deg) translateZ(${radius}px)`;
+        wrap.appendChild(face);
+      });
+    });
+
+    // 三层不同方向、不同速度的自转，营造星系感
+    const loops = [];
+    loops.push(anime({
+      targets: tierEls.outer,  rotateY: 360, duration: 42000, easing: 'linear', loop: true,
+    }));
+    loops.push(anime({
+      targets: tierEls.middle, rotateY: -360, duration: 30000, easing: 'linear', loop: true,
+    }));
+    loops.push(anime({
+      targets: tierEls.inner,  rotateY: 360, duration: 20000, easing: 'linear', loop: true,
+    }));
+
+    // 整体缓慢摇摆，让 3D 感更强
+    anime({
+      targets: galaxy,
+      keyframes: [
+        { rotateX: -10 },
+        { rotateX: -18 },
+        { rotateX: -10 },
+      ],
+      duration: 12000,
+      easing: 'easeInOutSine',
+      loop: true,
+    });
+
+    // 鼠标在 stage 上 → 三层全速旋转 2.6s
+    let boosted = false;
+    const boost = () => {
+      if (boosted) return;
+      boosted = true;
+      loops.forEach(a => a.pause());
+      anime({
+        targets: tierEls.outer,
+        rotateY: '+=720',
+        duration: 2600, easing: 'easeInOutQuad',
+      });
+      anime({
+        targets: tierEls.middle,
+        rotateY: '-=720',
+        duration: 2600, easing: 'easeInOutQuad',
+      });
+      anime({
+        targets: tierEls.inner,
+        rotateY: '+=720',
+        duration: 2600, easing: 'easeInOutQuad',
+        complete: () => {
+          boosted = false;
+          loops.forEach(a => a.play());
+        },
+      });
+    };
+    stage.addEventListener('mouseenter', boost);
+    stage.addEventListener('click', boost);
+  }
+
+  // ══════════════════════════════════════
+  // 02 · 复利脉冲 —— 六层流动环 + 中心大字
+  // ══════════════════════════════════════
+  const ringSvg = document.getElementById('rainbowRing');
+  if (ringSvg) {
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const RADII = [92, 80, 68, 56, 44, 32];     // 六层同心圆，由外到内
+    const palette = ['#d4ff62', '#00f5c8', '#38bdf8', '#a855f7', '#ff6b6b', '#ffd93d'];
+
+    // 清掉初始占位圆，重建六层
+    ringSvg.innerHTML = '';
+    RADII.forEach((r, i) => {
+      const C = 2 * Math.PI * r;
+      const c = document.createElementNS(SVG_NS, 'circle');
+      c.setAttribute('class', 'ring-circle r' + (i + 1));
+      c.setAttribute('cx', 100);
+      c.setAttribute('cy', 100);
+      c.setAttribute('r', r);
+      c.setAttribute('stroke', palette[i]);
+      c.setAttribute('stroke-width', 6);
+      c.setAttribute('fill', 'none');
+      c.setAttribute('stroke-linecap', 'round');
+      c.setAttribute('stroke-dasharray', C);
+      c.setAttribute('stroke-dashoffset', C);
+      c.style.transformOrigin = '100px 100px';
+      c.style.transform = `rotate(${i * 30}deg)`;
+      ringSvg.appendChild(c);
+    });
+
+    // 进入视口 → 触发首次描线 + 持续旋转
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+
+      // 首次：从内到外依次描线（视觉爆发）
+      anime({
+        targets: '.ring-circle',
+        strokeDashoffset: [el => parseFloat(el.getAttribute('stroke-dashoffset')), 0],
+        duration: 1200,
+        delay: anime.stagger(140, { from: 'last' }),
+        easing: 'easeOutCubic',
+      });
+
+      // 六层永久反向旋转
+      document.querySelectorAll('.ring-circle').forEach((c, i) => {
+        anime({
+          targets: c,
+          rotate: (i % 2 === 0 ? '+=360' : '-=360'),
+          duration: 8000 + i * 1200,
+          easing: 'linear',
+          loop: true,
+        });
+      });
+
+      // SVG 整体缓慢呼吸
+      anime({
+        targets: ringSvg,
+        scale: [0.96, 1.04],
+        duration: 5000,
+        easing: 'easeInOutSine',
+        direction: 'alternate',
+        loop: true,
+      });
+    };
+
+    const mo = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { start(); mo.disconnect(); } });
+    }, { threshold: 0.25 });
+    mo.observe(ringSvg);
+  }
+
+  // ══════════════════════════════════════
+  // 03 · 能量场 —— 字母矩阵地形，鼠标起伏 + JOSEPHINE 点名
+  // ══════════════════════════════════════
+  const grid = document.getElementById('staggerGrid');
+  if (grid) {
+    const COLS = 15, ROWS = 9;
+    const palette = ['#d4ff62', '#00f5c8', '#38bdf8', '#a855f7', '#ff6b6b', '#ffd93d'];
+    const cells = [];
+
+    // 字母矩阵设计：
+    //  - 第 4 行（中间）横向拼出 JOSEPHINE（9 个字母），跨 col 3-11
+    //  - 其余格子随机散落主题词字母
+    const NAME = 'JOSEPHINE';
+    const NAME_ROW = 4;
+    const NAME_COL_START = 3;
+    const THEME_LETTERS = 'COMPOUNDGROWBUILDLEARNINVESTCREATEOBSERVEADAPT'.split('');
+    const nameCells = new Set();
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'stagger-cell';
+        cell.dataset.col = c;
+        cell.dataset.row = r;
+
+        // 是否是 JOSEPHINE 字母格
+        const nameIdx = (r === NAME_ROW && c >= NAME_COL_START && c < NAME_COL_START + NAME.length)
+          ? c - NAME_COL_START : -1;
+
+        if (nameIdx >= 0) {
+          cell.classList.add('is-name');
+          cell.dataset.nameIdx = nameIdx;
+          cell.dataset.letter = NAME[nameIdx];
+          cell.innerHTML = `<span class="cell-letter">${NAME[nameIdx]}</span>`;
+          nameCells.add(cell);
+        } else {
+          // 主题词字母：60% 概率放，其余留空做呼吸
+          if (Math.random() < 0.6) {
+            const L = THEME_LETTERS[Math.floor(Math.random() * THEME_LETTERS.length)];
+            cell.classList.add('is-theme');
+            cell.dataset.letter = L;
+            cell.innerHTML = `<span class="cell-letter">${L}</span>`;
+          }
+        }
+        grid.appendChild(cell);
+        cells.push(cell);
+      }
+    }
+
+    let active = false;
+
+    // ── 周期脉冲：从随机点扩散波浪 + 字母同步放大 ──
+    function pulse() {
+      if (!active) return;
+      const fromCol = Math.floor(Math.random() * COLS);
+      const fromRow = Math.floor(Math.random() * ROWS);
+      anime({
+        targets: '.stagger-cell',
+        translateY: [
+          { value: 0, duration: 0 },
+          { value: () => '-=' + (16 + Math.random() * 26) + 'px', duration: 380, easing: 'easeOutQuad' },
+          { value: 0, duration: 900, easing: 'easeOutElastic(1, .5)' },
+        ],
+        delay: anime.stagger(55, {
+          grid: [COLS, ROWS],
+          from: fromRow * COLS + fromCol,
+        }),
+      });
+    }
+
+    // ── 鼠标地形起伏 ──
+    let lastMove = 0;
+    const stage = grid.parentElement;
+    stage.addEventListener('mousemove', e => {
+      const now = performance.now();
+      if (now - lastMove < 32) return;   // 节流 ~30fps
+      lastMove = now;
+
+      const rect = grid.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      cells.forEach(cell => {
+        const cr = cell.getBoundingClientRect();
+        const cx = cr.left + cr.width / 2 - rect.left;
+        const cy = cr.top  + cr.height / 2 - rect.top;
+        const dx = cx - mx, dy = cy - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const lift = Math.max(0, 1 - dist / 240);   // 0~1
+
+        cell.style.transform =
+          `translateZ(${lift * 90}px) scale(${1 + lift * 0.35})`;
+
+        const letter = cell.querySelector('.cell-letter');
+        if (lift > 0.05) {
+          const col = palette[Math.floor(lift * palette.length) % palette.length];
+          cell.style.background = col + Math.floor(lift * 90).toString(16).padStart(2, '0');
+          cell.style.borderColor = col;
+          if (letter) {
+            letter.style.color = col;
+            letter.style.opacity = Math.min(1, lift * 1.6);
+            letter.style.transform = `scale(${1 + lift * 0.5})`;
+            letter.style.textShadow = `0 0 ${lift * 18}px ${col}`;
+          }
+        } else {
+          cell.style.background = '';
+          cell.style.borderColor = '';
+          if (letter) {
+            letter.style.opacity = '';
+            letter.style.transform = '';
+            letter.style.textShadow = '';
+            letter.style.color = '';
+          }
+        }
+      });
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      cells.forEach(cell => {
+        cell.style.transition = 'transform .9s var(--ease-snap), background .9s, border-color .9s';
+        cell.style.transform = '';
+        cell.style.background = '';
+        cell.style.borderColor = '';
+        const letter = cell.querySelector('.cell-letter');
+        if (letter) {
+          letter.style.transition = 'opacity .9s, transform .9s, color .9s, text-shadow .9s';
+          letter.style.opacity = '';
+          letter.style.transform = '';
+          letter.style.textShadow = '';
+          letter.style.color = '';
+          setTimeout(() => { letter.style.transition = ''; }, 900);
+        }
+        setTimeout(() => { cell.style.transition = ''; }, 900);
+      });
+    });
+
+    // ── 入场：字母海先填满 → JOSEPHINE 最后逐字点亮 ──
+    const mo = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (e.isIntersecting && !active) {
+          active = true;
+
+          // (1) 全体字母海：从右下到左上波次浮现
+          anime({
+            targets: '.stagger-cell',
+            opacity: [0, 1],
+            scale: [
+              { value: 0.2, duration: 0 },
+              { value: 1,   duration: 700, easing: 'easeOutElastic(1, .55)' },
+            ],
+            delay: anime.stagger(16, { grid: [COLS, ROWS], from: 'last' }),
+            complete: () => {
+              // (2) JOSEPHINE 逐字点亮（高潮）
+              anime({
+                targets: '.stagger-cell.is-name .cell-letter',
+                opacity: [{ value: 1, duration: 300 }],
+                scale: [
+                  { value: 0.6, duration: 0 },
+                  { value: 1.25, duration: 350, easing: 'easeOutBack' },
+                  { value: 1, duration: 400, easing: 'easeOutQuad' },
+                ],
+                color: (el, i) => palette[i % palette.length],
+                textShadow: (el, i) => `0 0 24px ${palette[i % palette.length]}`,
+                delay: anime.stagger(110),
+                complete: () => {
+                  pulse();
+                  setInterval(pulse, 5500);
+                },
+              });
+            },
+          });
+          mo.disconnect();
+        }
+      });
+    }, { threshold: 0.2 });
+    mo.observe(grid);
+  }
+})();

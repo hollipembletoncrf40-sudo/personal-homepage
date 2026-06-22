@@ -11,7 +11,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=Playfair+Display:ital,wght@1,700;1,800;1,900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css?v=18" />
+    <link rel="stylesheet" href="style.css?v=19" />
   </head>
   <body>
 
@@ -482,6 +482,62 @@
           </ul>
         </section>
 
+        <!-- ── In Motion ── -->
+        <section class="motion-lab reveal" id="motion">
+          <p class="manifesto-label" data-en="// IN MOTION" data-zh="// 运转中">// IN MOTION</p>
+          <p class="motion-sub"
+             data-en="I live at the intersection of a few ideas. They don't sit still &mdash; neither do I."
+             data-zh="我活在几个想法的交叉点上。它们从未静止 &mdash;&mdash; 我也是。">
+            I live at the intersection of a few ideas. They don't sit still &mdash; neither do I.
+          </p>
+
+          <!-- 词环星系：三层 3D 词环嵌套，我活在这些词的交叉点 -->
+          <div class="motion-demo motion-cylinder-block">
+            <div class="cylinder-stage" id="cylinderStage">
+              <div class="galaxy" id="galaxy">
+                <div class="ring-tier t-outer"  data-tier="outer"></div>
+                <div class="ring-tier t-middle" data-tier="middle"></div>
+                <div class="ring-tier t-inner"  data-tier="inner"></div>
+              </div>
+            </div>
+            <p class="motion-caption"
+               data-en="The intersection where I build. Words I live at &mdash; rotating, overlapping, never still."
+               data-zh="我构建的交叉点。我活在这些词里 &mdash;&mdash; 旋转、重叠、从未静止。">
+              The intersection where I build. Words I live at &mdash; rotating, overlapping, never still.
+            </p>
+          </div>
+
+          <!-- 复利脉冲：多层流动环 + 中心大字 -->
+          <div class="motion-demo motion-ring-block">
+            <div class="ring-stage" id="ringStage">
+              <span class="ring-pulse"></span>
+              <span class="ring-pulse" style="animation-delay:1s"></span>
+              <span class="ring-pulse" style="animation-delay:2s"></span>
+              <svg class="rainbow-ring" viewBox="0 0 200 200" id="rainbowRing">
+                <circle class="ring-circle r1" cx="100" cy="100" r="80" />
+              </svg>
+              <div class="ring-core" data-en="compound" data-zh="复利">compound</div>
+            </div>
+            <p class="motion-caption"
+               data-en="My deepest belief &mdash; compounding in skills, trust, knowledge and time. The math is patient. The results arrive suddenly."
+               data-zh="我最深的信仰 &mdash;&mdash; 复利发生在技能、信任、知识与时间中。数学很有耐心，结果不显山露水，直到突然显现。">
+              My deepest belief &mdash; compounding in skills, trust, knowledge and time. The math is patient. The results arrive suddenly.
+            </p>
+          </div>
+
+          <!-- 能量场：3D 字母网格，鼠标走过地形起伏 -->
+          <div class="motion-demo motion-grid-block">
+            <div class="energy-stage">
+              <div class="stagger-grid" id="staggerGrid"></div>
+            </div>
+            <p class="motion-caption"
+               data-en="Every habit, every page, every shipped project &mdash; a deposit. The terrain of compounding, built one day at a time."
+               data-zh="每个习惯、每一页书、每个发布的项目 &mdash;&mdash; 都是一笔存款。复利的地形，由每一天堆叠而成。">
+              Every habit, every page, every shipped project &mdash; a deposit. The terrain of compounding, built one day at a time.
+            </p>
+          </div>
+        </section>
+
         <!-- ── Connect ── -->
         <section class="connect reveal">
           <p class="manifesto-label" data-en="// LET'S GROW TOGETHER" data-zh="// 一起成长">// LET'S GROW TOGETHER</p>
@@ -521,6 +577,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
