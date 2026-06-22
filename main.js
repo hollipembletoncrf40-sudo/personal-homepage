@@ -404,8 +404,17 @@ document.addEventListener('keydown', e => {
 (function () {
   if (!window.THREE) { console.warn('Three.js not loaded'); return; }
 
-  const canvas = document.getElementById('threeCanvas');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  // WebGL 上下文偶发创建失败（GPU 占用/隐私模式/插件冲突）——不能让它
+  // 抛出未捕获错误，否则后面所有脚本（包括 IN MOTION）都不会执行。
+  let renderer;
+  try {
+    const canvas = document.getElementById('threeCanvas');
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  } catch (err) {
+    console.warn('Three.js WebGL init failed — skipping 3D blob:', err);
+    return;
+  }
+  const canvas = renderer.domElement;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x000000, 0);
